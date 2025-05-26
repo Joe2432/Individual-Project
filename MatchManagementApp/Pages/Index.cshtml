@@ -1,0 +1,51 @@
+﻿@page
+@model MatchManagementApp.UI.Pages.IndexModel
+@{
+    ViewData["Title"] = "Index";
+}
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Welcome to the Match Management App</h2>
+
+    <div class="row row-cols-1 row-cols-md-2 g-4 justify-content-center">
+        <div class="col">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Create New Match</h5>
+                    <p class="card-text">Set up a singles or doubles match with your chosen rules.</p>
+                    <a asp-page="/CreateMatch" class="btn btn-success">Go to Create Match</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Match History</h5>
+                    <p class="card-text">View all your previously played matches with stats.</p>
+                    <a asp-page="/MatchHistory" class="btn btn-primary">View History</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title">User Profile</h5>
+                    <p class="card-text">View and manage your account details.</p>
+                    <a asp-page="/Account/User" class="btn btn-info">View Profile</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Continue a Match</h5>
+                    <p class="card-text">Return to a match in progress. (Example ID = 1)</p>
+                    <a asp-page="/PlayMatch" asp-route-id="1" class="btn btn-warning">Play Match</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

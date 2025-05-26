@@ -1,0 +1,38 @@
+﻿@page
+@model MatchManagementApp.UI.Pages.MatchHistoryModel
+@{
+    ViewData["Title"] = "Match History";
+}
+
+<h2>Match History</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Match Type</th>
+            <th>Opponent(s)</th>
+            <th>Surface</th>
+            <th>Date</th>
+            <th>Score</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var summary in Model.MatchSummaries)
+        {
+            var match = summary.Match;
+            <tr>
+                <td>@match.MatchType</td>
+                <td>
+                    @match.FirstOpponentName
+                    @if (!string.IsNullOrEmpty(match.SecondOpponentName))
+                    {
+                        <span> & @match.SecondOpponentName</span>
+                    }
+                </td>
+                <td>@match.Surface</td>
+                <td>@match.MatchDate.ToShortDateString()</td>
+                <td>@summary.ScoreSummary</td>
+            </tr>
+        }
+    </tbody>
+</table>

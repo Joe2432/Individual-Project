@@ -1,0 +1,38 @@
+﻿@page
+@model LoginModel
+@{
+    ViewData["Title"] = "Login";
+}
+
+<div class="container mt-5" style="max-width: 500px;">
+    <h2 class="text-center mb-4">Welcome Back</h2>
+
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger">@Model.ErrorMessage</div>
+    }
+
+    <form method="post">
+        <div class="mb-3">
+            <label asp-for="Username" class="form-label">Username</label>
+            <input asp-for="Username" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Password" class="form-label">Password</label>
+            <input asp-for="Password" class="form-control" type="password" />
+        </div>
+
+        <div class="d-grid">
+            <button type="submit" class="btn btn-primary">Login</button>
+        </div>
+
+        <div class="text-center mt-3">
+            <a asp-page="/Account/Register">Don't have an account? Sign up</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

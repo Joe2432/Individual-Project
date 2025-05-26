@@ -1,0 +1,61 @@
+﻿@page
+@model MatchManagementApp.UI.Pages.CreateMatchModel
+@{
+    ViewData["Title"] = "Create Match";
+}
+
+<h2>Create Match</h2>
+<form method="post">
+    <div class="form-group">
+        <label asp-for="Match.MatchType"></label>
+        <select asp-for="Match.MatchType" class="form-control">
+            <option value="Singles">Singles</option>
+            <option value="Doubles">Doubles</option>
+        </select>
+    </div>
+    @if (Model.Match.MatchType == "Doubles")
+    {
+        <div class="form-group">
+            <label asp-for="Match.PartnerName"></label>
+            <input asp-for="Match.PartnerName" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label asp-for="Match.SecondOpponentName"></label>
+            <input asp-for="Match.SecondOpponentName" class="form-control" />
+        </div>
+    }
+    <div class="form-group">
+        <label asp-for="Match.FirstOpponentName"></label>
+        <input asp-for="Match.FirstOpponentName" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="Match.NrSets"></label>
+        <select asp-for="Match.NrSets" class="form-control">
+            <option>3</option>
+            <option>5</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label asp-for="Match.FinalSetType"></label>
+        <select asp-for="Match.FinalSetType" class="form-control">
+            <option>Maxi Tiebreak</option>
+            <option>Normal Set</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label asp-for="Match.GameFormat"></label>
+        <select asp-for="Match.GameFormat" class="form-control">
+            <option>With Advantage</option>
+            <option>Decisive Point at 40-40</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label asp-for="Match.Surface"></label>
+        <select asp-for="Match.Surface" class="form-control">
+            <option>Hard</option>
+            <option>Clay</option>
+            <option>Grass</option>
+        </select>
+    </div>
+    <button type="submit" class="btn btn-success">Create</button>
+</form>
