@@ -1,59 +1,92 @@
-﻿public class MatchService : IMatchService
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+public class MatchService : IMatchService
 {
     private readonly IMatchRepository _matchRepository;
     private readonly IPointRepository _pointRepository;
+    private readonly IUserRepository _userRepository;
 
-    public MatchService(IMatchRepository matchRepository, IPointRepository pointRepository)
+    public MatchService(
+        IMatchRepository matchRepository,
+        IPointRepository pointRepository,
+        IUserRepository userRepository)
     {
         _matchRepository = matchRepository;
         _pointRepository = pointRepository;
+        _userRepository = userRepository;
     }
 
     public async Task<int> CreateMatchAsync(MatchCreateDto dto)
     {
-        var entity = MatchMapper.ToEntity(dto);
-        return await _matchRepository.CreateMatchAsync(entity); // Correct method name
+        Console.WriteLine($"[MatchService] Received match creation request for user ID: {dto.CreatedByUserId}");
+
+        var user = await _userRepository.GetUserByIdAsync(dto.CreatedByUserId);
+
+        if (user == null)
+        {
+            Console.WriteLine($"[MatchService] ERROR: No user found in DB with ID {dto.CreatedByUserId}");
+            throw new InvalidOperationException("Cannot create match: user does not exist.");
+        }
+
+        Console.WriteLine($"[MatchService] User verified. Proceeding to create match.");
+        return await _matchRepository.CreateMatchAsync(dto);
     }
 
-
-
-    public async Task<List<MatchCreateDto>> GetUserMatchesAsync(int userId)
+    public async Task<List<MatchReadDto>> GetUserMatchesAsync(int userId)
     {
-        var matches = await _matchRepository.GetMatchesByUserIdAsync(userId);
-        return matches.Select(m => m.ToDto()).ToList();
+        Console.WriteLine($"[MatchService] Fetching matches for user ID: {userId}");
+        return await _matchRepository.GetMatchesByUserIdAsync(userId);
     }
 
     public async Task<string> GetScoreDisplayAsync(int matchId, int userId)
     {
-        var match = await _matchRepository.GetMatchByIdAsync(matchId);
-        if (match == null) return "Match not found";
+        Console.WriteLine($"[MatchService] Calculating score for match ID: {matchId}");
 
-        var points = match.Points;
-        var player1Points = points.Count(p => p.WinnerLabel == "User");
-        var player2Points = points.Count(p => p.WinnerLabel == "Opponent");
+        var match = await _matchRepository.GetMatchByIdAsync(matchId);
+        if (match == null)
+        {
+            Console.WriteLine($"[MatchService] ERROR: Match ID {matchId} not found.");
+            return "Match not found";
+        }
+
+        var points = await _pointRepository.GetPointsByMatchIdAsync(matchId);
+        var player1Points = points.Count(p => p.IsUserWinner);
+        var player2Points = points.Count(p => !p.IsUserWinner);
+
+        Console.WriteLine($"[MatchService] Current score: {player1Points} - {player2Points}");
 
         return $"{player1Points} - {player2Points}";
     }
 
     public async Task RegisterPointAsync(int matchId, int userId, string pointType, bool isUserWinner)
     {
-        var winnerLabel = isUserWinner ? "User" : "Opponent";
+        Console.WriteLine($"[MatchService] Registering point for match ID: {matchId}, won by {(isUserWinner ? "User" : "Opponent")}");
 
         var match = await _matchRepository.GetMatchByIdAsync(matchId);
-        if (match == null) return;
+        if (match == null)
+        {
+            Console.WriteLine($"[MatchService] ERROR: Match ID {matchId} not found. Point not registered.");
+            return;
+        }
 
-        var point = new PointEntity(matchId, winnerLabel, pointType, 0); // You can pass shot count if needed
+        var point = new PointCreateDto
+        {
+            MatchId = matchId,
+            PointType = pointType,
+            NumberOfShots = 0,
+            IsUserWinner = isUserWinner
+        };
+
         await _pointRepository.AddPointAsync(point);
+        Console.WriteLine("[MatchService] Point successfully registered.");
     }
-
 
     public async Task UndoLastPointAsync(int matchId)
     {
-        var points = await _pointRepository.GetPointsByMatchIdAsync(matchId);
-        var lastPoint = points.OrderByDescending(p => p.Id).FirstOrDefault();
-        if (lastPoint != null)
-        {
-            await _pointRepository.DeletePointAsync(lastPoint);
-        }
+        Console.WriteLine($"[MatchService] Undoing last point for match ID: {matchId}");
+        await _pointRepository.DeleteLastPointAsync(matchId);
     }
 }

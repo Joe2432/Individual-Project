@@ -2,5 +2,5 @@
 
 public interface IAuthService
 {
-    ClaimsPrincipal GetClaimsPrincipal(UserEntity user);
+    ClaimsPrincipal GetClaimsPrincipal(UserCreateDto user);
 }
