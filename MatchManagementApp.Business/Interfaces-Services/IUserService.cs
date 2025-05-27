@@ -1,5 +1,4 @@
 ﻿using System.Security.Claims;
-using System.Threading.Tasks;
 
 public interface IUserService
 {
@@ -11,4 +10,7 @@ public interface IUserService
     Task<int?> GetCurrentUserId(ClaimsPrincipal principal);
     Task<UserCreateDto> GetUserViewModelAsync(int userId);
     Task DeleteUserAsync(int userId);
+    Task<SignInResult> TrySignInAsync(string username, string password);
+    Task<RegisterResult> TryRegisterAsync(UserCreateDto userDto);
+    Task<UserReadDto?> GetUserByIdAsync(int userId);
 }

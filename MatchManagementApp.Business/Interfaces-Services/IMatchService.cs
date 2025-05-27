@@ -5,4 +5,7 @@
     Task<string> GetScoreDisplayAsync(int matchId, int userId);
     Task RegisterPointAsync(int matchId, int userId, string pointType, bool isUserWinner);
     Task UndoLastPointAsync(int matchId);
+    Task<PlayMatchDto?> GetPlayMatchDtoAsync(int matchId, int userId);
+    Task<List<MatchHistoryDto>> GetMatchHistorySummariesAsync(int userId);
+
 }

@@ -5,32 +5,32 @@
 }
 
 <h2>Create Match</h2>
-<form method="post">
+<form method="post" id="createMatchForm">
+    <div asp-validation-summary="All" class="text-danger"></div>
     <div class="form-group">
         <label asp-for="Match.MatchType"></label>
-        <select asp-for="Match.MatchType" class="form-control">
+        <select asp-for="Match.MatchType" class="form-control" id="matchTypeSelect">
+            <option value="">Select Type</option>
             <option value="Singles">Singles</option>
             <option value="Doubles">Doubles</option>
         </select>
     </div>
-    @if (Model.Match.MatchType == "Doubles")
-    {
-        <div class="form-group">
-            <label asp-for="Match.PartnerName"></label>
-            <input asp-for="Match.PartnerName" class="form-control" />
-        </div>
-        <div class="form-group">
-            <label asp-for="Match.SecondOpponentName"></label>
-            <input asp-for="Match.SecondOpponentName" class="form-control" />
-        </div>
-    }
-    <div class="form-group">
+    <div class="form-group" id="partnerDiv">
+        <label asp-for="Match.PartnerName"></label>
+        <input asp-for="Match.PartnerName" class="form-control" />
+    </div>
+    <div class="form-group" id="firstOpponentDiv">
         <label asp-for="Match.FirstOpponentName"></label>
         <input asp-for="Match.FirstOpponentName" class="form-control" />
+    </div>
+    <div class="form-group" id="secondOpponentDiv">
+        <label asp-for="Match.SecondOpponentName"></label>
+        <input asp-for="Match.SecondOpponentName" class="form-control" />
     </div>
     <div class="form-group">
         <label asp-for="Match.NrSets"></label>
         <select asp-for="Match.NrSets" class="form-control">
+            <option value="">Select Sets</option>
             <option>3</option>
             <option>5</option>
         </select>
@@ -38,6 +38,7 @@
     <div class="form-group">
         <label asp-for="Match.FinalSetType"></label>
         <select asp-for="Match.FinalSetType" class="form-control">
+            <option value="">Select Final Set</option>
             <option>Maxi Tiebreak</option>
             <option>Normal Set</option>
         </select>
@@ -45,17 +46,42 @@
     <div class="form-group">
         <label asp-for="Match.GameFormat"></label>
         <select asp-for="Match.GameFormat" class="form-control">
+            <option value="">Select Format</option>
             <option>With Advantage</option>
-            <option>Decisive Point at 40-40</option>
+            <option>NoAd</option>
         </select>
     </div>
     <div class="form-group">
         <label asp-for="Match.Surface"></label>
         <select asp-for="Match.Surface" class="form-control">
+            <option value="">Select Surface</option>
             <option>Hard</option>
             <option>Clay</option>
             <option>Grass</option>
         </select>
     </div>
-    <button type="submit" class="btn btn-success">Create</button>
+    <button type="submit" class="btn btn-primary">Create</button>
 </form>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const matchType = document.getElementById("matchTypeSelect");
+            const partnerDiv = document.getElementById("partnerDiv");
+            const secondOpponentDiv = document.getElementById("secondOpponentDiv");
+
+            function toggleDoublesFields() {
+                if (matchType.value === "Doubles") {
+                    partnerDiv.style.display = "";
+                    secondOpponentDiv.style.display = "";
+                } else {
+                    partnerDiv.style.display = "none";
+                    secondOpponentDiv.style.display = "none";
+                }
+            }
+
+            matchType.addEventListener("change", toggleDoublesFields);
+            toggleDoublesFields();
+        });
+    </script>
+}

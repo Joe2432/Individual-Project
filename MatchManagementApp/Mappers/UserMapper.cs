@@ -1,6 +1,4 @@
-﻿namespace MatchManagementApp.UI.Mappers
-{
-    public static class UserMapper
+﻿    public static class UserMapper
     {
         public static UserCreateDto ToCreateDto(UserRegistrationViewModel vm)
         {
@@ -13,5 +11,17 @@
                 Gender = vm.Gender
             };
         }
+
+        public static UserRegistrationViewModel ToRegistrationViewModel(UserReadDto dto)
+        {
+            return new UserRegistrationViewModel
+            {
+                Username = dto.Username,
+                Email = dto.Email,
+                Password = string.Empty,
+                ConfirmPassword = string.Empty,
+                Age = dto.Age,
+                Gender = dto.Gender
+            };
+        }
     }
-}

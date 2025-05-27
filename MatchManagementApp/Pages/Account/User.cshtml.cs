@@ -24,19 +24,15 @@ namespace MatchManagementApp.UI.Pages.Account
             if (userId == null)
                 return RedirectToPage("/Account/Login");
 
-            var dto = await _userService.GetUserViewModelAsync(userId.Value);
-            Profile = new UserRegistrationViewModel
-            {
-                Username = dto.Username,
-                Email = dto.Email,
-                Password = dto.Password,
-                ConfirmPassword = dto.Password,
-                Age = dto.Age,
-                Gender = dto.Gender
-            };
+            var userDto = await _userService.GetUserByIdAsync(userId.Value);
+            if (userDto == null)
+                return RedirectToPage("/Account/Login");
+
+            Profile = UserMapper.ToRegistrationViewModel(userDto);
 
             return Page();
         }
+
 
         public async Task<IActionResult> OnPostLogoutAsync()
         {

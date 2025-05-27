@@ -31,38 +31,24 @@ public class LoginModel : PageModel
         public string Password { get; set; } = string.Empty;
     }
 
-    public void OnGet()
-    {
-    }
+    public void OnGet() { }
 
     public async Task<IActionResult> OnPostAsync()
     {
         if (!ModelState.IsValid)
             return Page();
 
-        var userEntity = await _userService.GetUserEntityByUsernameAsync(Input.Username);
+        var signInResult = await _userService.TrySignInAsync(Input.Username, Input.Password);
 
-        if (userEntity == null || !_userService.VerifyPassword(userEntity.PasswordHash, Input.Password))
+        if (!signInResult.Success)
         {
-            ErrorMessage = "Invalid username or password.";
+            ErrorMessage = signInResult.ErrorMessage;
             return Page();
         }
 
-        var userDto = new UserCreateDto
-        {
-            Id = userEntity.Id,
-            Username = userEntity.Username,
-            Email = userEntity.Email,
-            PasswordHash = userEntity.PasswordHash,
-            Age = userEntity.Age,
-            Gender = userEntity.Gender
-        };
-
-        var claimsPrincipal = _authService.GetClaimsPrincipal(userDto);
-
         await HttpContext.SignInAsync(
             CookieAuthenticationDefaults.AuthenticationScheme,
-            claimsPrincipal,
+            signInResult.ClaimsPrincipal,
             new AuthenticationProperties
             {
                 IsPersistent = true,
