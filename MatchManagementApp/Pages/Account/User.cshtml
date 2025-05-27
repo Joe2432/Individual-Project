@@ -24,9 +24,13 @@
             <dd class="col-sm-9">@Model.Profile.Gender</dd>
         </dl>
 
-        <form method="post" asp-page-handler="Delete">
+        <form method="post" asp-page-handler="Logout">
+            <button type="submit" class="btn btn-warning">Logout</button>
+        </form>
+
+        <form method="post" asp-page-handler="Delete" onsubmit="return confirm('Are you sure you want to delete your account?');">
             <button type="submit" class="btn btn-danger">Delete Account</button>
         </form>
-        <a asp-page="/Account/Logout" class="btn btn-outline-secondary mt-2">Logout</a>
+
     </div>
 </div>

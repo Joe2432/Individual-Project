@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace MatchManagementApp.UI.Pages.Account
 {
@@ -36,13 +38,22 @@ namespace MatchManagementApp.UI.Pages.Account
             return Page();
         }
 
+        public async Task<IActionResult> OnPostLogoutAsync()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return RedirectToPage("/Account/Login");
+        }
+
         public async Task<IActionResult> OnPostDeleteAsync()
         {
             var userId = await _userService.GetCurrentUserId(User);
             if (userId != null)
+            {
                 await _userService.DeleteUserAsync(userId.Value);
+                await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            }
 
-            return RedirectToPage("/Index");
+            return RedirectToPage("/Account/Register");
         }
     }
 }

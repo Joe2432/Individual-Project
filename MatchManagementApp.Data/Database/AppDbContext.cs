@@ -12,6 +12,6 @@ public class AppDbContext : DbContext
     {
         modelBuilder.ApplyConfiguration(new UserEntityConfiguration());
         modelBuilder.ApplyConfiguration(new MatchEntityConfiguration());
-        modelBuilder.ApplyConfiguration(new PointEntityConfiguration()); // Add this when defined
+        modelBuilder.ApplyConfiguration(new PointEntityConfiguration());
     }
 }

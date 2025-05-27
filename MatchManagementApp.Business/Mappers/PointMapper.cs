@@ -1,18 +1,18 @@
 ﻿public static class PointMapper
 {
-    public static PointReadDto ToReadDto(this PointEntity entity, int userId)
+    public static PointReadDto ToReadDto(this PointEntity entity)
     {
         return new PointReadDto
         {
             PointType = entity.WinningMethod,
             NumberOfShots = entity.NrShots,
-            IsUserWinner = entity.WinnerId == userId
+            IsUserWinner = entity.WinnerLabel == "User"
         };
     }
 
-    public static PointEntity ToEntity(this PointCreateDto dto, int userId)
+    public static PointEntity ToEntity(this PointCreateDto dto)
     {
-        var winnerId = dto.IsUserWinner ? userId : -1;
-        return new PointEntity(dto.MatchId, winnerId, dto.PointType, dto.NumberOfShots);
+        var winnerLabel = dto.IsUserWinner ? "User" : "Opponent";
+        return new PointEntity(dto.MatchId, winnerLabel, dto.PointType, dto.NumberOfShots);
     }
 }

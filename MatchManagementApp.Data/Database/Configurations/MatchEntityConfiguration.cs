@@ -15,10 +15,10 @@ public class MatchEntityConfiguration : IEntityTypeConfiguration<MatchEntity>
         builder.Property(m => m.Surface).IsRequired();
 
         builder.Property(m => m.MatchDate)
-    .IsRequired()
-    .HasDefaultValueSql("GETUTCDATE()");
+            .IsRequired()
+            .HasDefaultValueSql("GETUTCDATE()");
 
-        builder.HasOne<UserEntity>()
+        builder.HasOne(m => m.User)
             .WithMany()
             .HasForeignKey(m => m.CreatedByUserId)
             .OnDelete(DeleteBehavior.Cascade);

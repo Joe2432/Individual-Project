@@ -11,10 +11,11 @@
 
     public async Task<int> CreateMatchAsync(MatchCreateDto dto)
     {
-        var entity = dto.ToEntity();
-        var matchId = await _matchRepository.CreateMatchAsync(entity);
-        return matchId;
+        var entity = MatchMapper.ToEntity(dto);
+        return await _matchRepository.CreateMatchAsync(entity); // Correct method name
     }
+
+
 
     public async Task<List<MatchCreateDto>> GetUserMatchesAsync(int userId)
     {
@@ -28,20 +29,23 @@
         if (match == null) return "Match not found";
 
         var points = match.Points;
-        var player1Points = points.Count(p => p.WinnerId == match.CreatedByUserId);
-        var player2Points = points.Count(p => p.WinnerId != match.CreatedByUserId);
+        var player1Points = points.Count(p => p.WinnerLabel == "User");
+        var player2Points = points.Count(p => p.WinnerLabel == "Opponent");
 
         return $"{player1Points} - {player2Points}";
     }
 
-    public async Task RegisterPointAsync(int matchId, int userId, string pointType)
+    public async Task RegisterPointAsync(int matchId, int userId, string pointType, bool isUserWinner)
     {
+        var winnerLabel = isUserWinner ? "User" : "Opponent";
+
         var match = await _matchRepository.GetMatchByIdAsync(matchId);
         if (match == null) return;
 
-        var point = new PointEntity(matchId, userId, pointType, 0); // 0 shots for now
+        var point = new PointEntity(matchId, winnerLabel, pointType, 0); // You can pass shot count if needed
         await _pointRepository.AddPointAsync(point);
     }
+
 
     public async Task UndoLastPointAsync(int matchId)
     {

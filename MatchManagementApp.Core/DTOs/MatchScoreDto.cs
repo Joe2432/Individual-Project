@@ -6,4 +6,9 @@
     public string CurrentGameScore { get; set; } = string.Empty;
     public bool InTiebreak { get; set; }
     public bool MatchOver { get; set; }
+    public string Display()
+    {
+        return $"Sets: {Player1SetsWon}-{Player2SetsWon} | Current Game: {CurrentGameScore}";
+    }
+
 }

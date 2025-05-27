@@ -1,35 +1,38 @@
-﻿public class UserRepository : IUserRepository
+﻿using Microsoft.EntityFrameworkCore;
+
+public class UserRepository : IUserRepository
 {
-    private static readonly List<UserEntity> _users = new();
-    private static int _idCounter = 1;
+    private readonly AppDbContext _context;
 
-    public Task<UserEntity?> GetUserByEmailAsync(string email)
+    public UserRepository(AppDbContext context)
     {
-        var user = _users.FirstOrDefault(u => u.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
-        return Task.FromResult(user);
+        _context = context;
     }
 
-    public Task<UserEntity?> GetUserByUsernameAsync(string username)
+    public async Task<UserEntity?> GetUserByEmailAsync(string email)
     {
-        var user = _users.FirstOrDefault(u => u.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
-        return Task.FromResult(user);
+        return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
     }
 
-    public Task<UserEntity?> GetUserByIdAsync(int userId)
+    public async Task<UserEntity?> GetUserByUsernameAsync(string username)
     {
-        var user = _users.FirstOrDefault(u => u.Id == userId);
-        return Task.FromResult(user);
+        return await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
     }
 
-    public Task CreateUserAsync(UserEntity user)
+    public async Task<UserEntity?> GetUserByIdAsync(int userId)
     {
-        _users.Add(user);
-        return Task.CompletedTask;
+        return await _context.Users.FindAsync(userId);
     }
 
-    public Task DeleteUserAsync(UserEntity user)
+    public async Task CreateUserAsync(UserEntity user)
     {
-        _users.Remove(user);
-        return Task.CompletedTask;
+        await _context.Users.AddAsync(user);
+        await _context.SaveChangesAsync(); // This is what persists to the database
+    }
+
+    public async Task DeleteUserAsync(UserEntity user)
+    {
+        _context.Users.Remove(user);
+        await _context.SaveChangesAsync();
     }
 }

@@ -1,30 +1,38 @@
-﻿public class MatchRepository : IMatchRepository
+﻿using Microsoft.EntityFrameworkCore;
+
+public class MatchRepository : IMatchRepository
 {
-    private static readonly List<MatchEntity> _matches = new();
+    private readonly AppDbContext _context;
 
-    public Task<int> CreateMatchAsync(MatchEntity match)
+    public MatchRepository(AppDbContext context)
     {
-        _matches.Add(match);
-        return Task.FromResult(match.Id);
+        _context = context;
     }
 
-    public Task<List<MatchEntity>> GetMatchesByUserIdAsync(int userId)
+    public async Task<int> CreateMatchAsync(MatchEntity match)
     {
-        var result = _matches.Where(m => m.CreatedByUserId == userId).ToList();
-        return Task.FromResult(result);
+        _context.Matches.Add(match);
+        await _context.SaveChangesAsync();
+        return match.Id; // EF will auto-generate this
     }
 
-    public Task<MatchEntity?> GetMatchByIdAsync(int matchId)
+    public async Task<List<MatchEntity>> GetMatchesByUserIdAsync(int userId)
     {
-        var match = _matches.FirstOrDefault(m => m.Id == matchId);
-        return Task.FromResult(match);
+        return await _context.Matches
+            .Where(m => m.CreatedByUserId == userId)
+            .ToListAsync();
     }
 
-    public Task UpdateMatchAsync(MatchEntity match)
+    public async Task<MatchEntity?> GetMatchByIdAsync(int matchId)
     {
-        var index = _matches.FindIndex(m => m.Id == match.Id);
-        if (index >= 0)
-            _matches[index] = match;
-        return Task.CompletedTask;
+        return await _context.Matches
+            .Include(m => m.Points)
+            .FirstOrDefaultAsync(m => m.Id == matchId);
+    }
+
+    public async Task UpdateMatchAsync(MatchEntity match)
+    {
+        _context.Matches.Update(match);
+        await _context.SaveChangesAsync();
     }
 }

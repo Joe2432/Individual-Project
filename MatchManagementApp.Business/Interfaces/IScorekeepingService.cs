@@ -1,4 +1,4 @@
 ﻿public interface IScorekeepingService
 {
-    MatchScoreDto CalculateScore(MatchEntity match, List<PointEntity> points);
+    MatchScoreDto CalculateScore(MatchEntity match, IEnumerable<PointEntity> points);
 }

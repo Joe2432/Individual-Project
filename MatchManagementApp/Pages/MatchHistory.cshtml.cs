@@ -1,5 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MatchManagementApp.UI.Pages
 {
@@ -26,7 +29,7 @@ namespace MatchManagementApp.UI.Pages
             _scoreService = scoreService;
         }
 
-        public List<(MatchEntity Match, string ScoreSummary)> MatchSummaries { get; private set; } = new();
+        public List<(MatchEntity Match, string ScoreSummary, bool MatchOver)> MatchSummaries { get; private set; } = new();
 
         public async Task OnGetAsync()
         {
@@ -42,9 +45,9 @@ namespace MatchManagementApp.UI.Pages
 
                 var formatted = string.Join(" ", score.SetScores
                     .Where(s => s.Player1Games > 0 || s.Player2Games > 0)
-                    .Select(s => $"{s.Player1Games}-{s.Player2Games}"));
+                    .Select(s => s.ToString()));
 
-                MatchSummaries.Add((match, formatted));
+                MatchSummaries.Add((match, formatted, score.MatchOver));
             }
         }
     }

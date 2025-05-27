@@ -19,16 +19,16 @@ public class PointService : IPointService
         var userId = await _userService.GetCurrentUserId(user)
             ?? throw new InvalidOperationException("User not logged in.");
 
-        var point = dto.ToEntity(userId);
+        // Map to "User" or "Opponent" label
+        var winnerLabel = dto.IsUserWinner ? "User" : "Opponent";
+        var point = new PointEntity(dto.MatchId, winnerLabel, dto.PointType, dto.NumberOfShots);
+
         await _pointRepository.AddPointAsync(point);
     }
 
     public async Task<List<PointReadDto>> GetPointsForMatchAsync(int matchId, ClaimsPrincipal user)
     {
-        var userId = await _userService.GetCurrentUserId(user)
-            ?? throw new InvalidOperationException("User not logged in.");
-
         var points = await _pointRepository.GetPointsByMatchIdAsync(matchId);
-        return points.Select(p => p.ToReadDto(userId)).ToList();
+        return points.Select(p => p.ToReadDto()).ToList(); // No userId needed anymore
     }
 }

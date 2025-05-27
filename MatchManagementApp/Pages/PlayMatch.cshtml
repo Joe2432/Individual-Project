@@ -1,56 +1,90 @@
-﻿using MatchManagementApp.Core.DTOs;
-using MatchManagementApp.Data.Entities;
-using MatchManagementApp.Data.Interfaces;
-using MatchManagementApp.Services;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc.RazorPages;
+﻿@page
+@model MatchManagementApp.UI.Pages.PlayMatchModel
+@{
+    ViewData["Title"] = "Play Match";
+}
 
-namespace MatchManagementApp.UI.Pages
+<h2>Play Match</h2>
+
+@if (Model.Score != null)
 {
-    [Authorize]
-    public class MatchHistoryModel : PageModel
-    {
-        private readonly IMatchService _matchService;
-        private readonly IUserService _userService;
-        private readonly IMatchRepository _matchRepo;
-        private readonly IPointRepository _pointRepo;
-        private readonly IScorekeepingService _scoreService;
+    <div class="scoreboard border p-3 mb-4 rounded bg-light">
+        <table class="table table-bordered text-center mb-0">
+            <thead class="table-secondary">
+                <tr>
+                    <th></th>
+                    @for (int i = 0; i < Model.Score.SetScores.Count; i++)
+                    {
+                        var set = Model.Score.SetScores[i];
+                        bool isFinalSet = i == Model.Score.SetScores.Count - 1;
+                        bool isEmptyFinalSet = isFinalSet && set.Player1Games == 0 && set.Player2Games == 0 && Model.Score.MatchOver;
 
-        public MatchHistoryModel(
-            IMatchService matchService,
-            IUserService userService,
-            IMatchRepository matchRepo,
-            IPointRepository pointRepo,
-            IScorekeepingService scoreService)
-        {
-            _matchService = matchService;
-            _userService = userService;
-            _matchRepo = matchRepo;
-            _pointRepo = pointRepo;
-            _scoreService = scoreService;
-        }
+                        if (!isEmptyFinalSet)
+                        {
+                            <th>Set @(@i + 1)</th>
+                        }
+                    }
+                    <th>In Game</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>You</strong></td>
+                    @for (int i = 0; i < Model.Score.SetScores.Count; i++)
+                    {
+                        var set = Model.Score.SetScores[i];
+                        bool isFinalSet = i == Model.Score.SetScores.Count - 1;
+                        bool isEmptyFinalSet = isFinalSet && set.Player1Games == 0 && set.Player2Games == 0 && Model.Score.MatchOver;
 
-        public List<(MatchEntity Match, string ScoreSummary)>
-    MatchSummaries { get; private set; } = new();
+                        if (!isEmptyFinalSet)
+                        {
+                            <td>@set.ToString().Split('-')[0]</td>
+                        }
+                    }
+                    <td>@Model.Score.CurrentGameScore.Split('-')[0]</td>
+                </tr>
+                <tr>
+                    <td><strong>Opponent</strong></td>
+                    @for (int i = 0; i < Model.Score.SetScores.Count; i++)
+                    {
+                        var set = Model.Score.SetScores[i];
+                        bool isFinalSet = i == Model.Score.SetScores.Count - 1;
+                        bool isEmptyFinalSet = isFinalSet && set.Player1Games == 0 && set.Player2Games == 0 && Model.Score.MatchOver;
 
-    public async Task OnGetAsync()
-    {
-    var userId = await _userService.GetCurrentUserId(User);
-    if (userId == null) return;
+                        if (!isEmptyFinalSet)
+                        {
+                            <td>@set.ToString().Split('-')[1]</td>
+                        }
+                    }
+                    <td>@Model.Score.CurrentGameScore.Split('-')[1]</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+}
 
-    var matches = await _matchRepo.GetMatchesByUserIdAsync(userId.Value);
+<div class="row">
+    <div class="col-md-6 text-center">
+        <h4>You Won The Point</h4>
+        <form method="post">
+            <input type="hidden" name="isUserWinner" value="true" />
+            <button type="submit" name="pointType" value="Ace" class="btn btn-success m-2">Ace</button>
+            <button type="submit" name="pointType" value="Winner" class="btn btn-success m-2">Winner</button>
+            <button type="submit" name="pointType" value="Unforced Error" class="btn btn-success m-2">Unforced Error</button>
+            <button type="submit" name="pointType" value="Forced Error" class="btn btn-success m-2">Forced Error</button>
+            <button type="submit" name="pointType" value="Double Fault" class="btn btn-success m-2">Double Fault</button>
+        </form>
+    </div>
 
-    foreach (var match in matches)
-    {
-    var points = await _pointRepo.GetPointsByMatchIdAsync(match.Id);
-    var score = _scoreService.CalculateScore(match, points);
-
-    var formatted = string.Join(" ", score.SetScores
-    .Where(s => s.Player1Games > 0 || s.Player2Games > 0)
-    .Select(s => $"{s.Player1Games}-{s.Player2Games}"));
-
-    MatchSummaries.Add((match, formatted));
-    }
-    }
-    }
-    }
+    <div class="col-md-6 text-center">
+        <h4>Opponent Won The Point</h4>
+        <form method="post">
+            <input type="hidden" name="isUserWinner" value="false" />
+            <button type="submit" name="pointType" value="Ace" class="btn btn-danger m-2">Ace</button>
+            <button type="submit" name="pointType" value="Winner" class="btn btn-danger m-2">Winner</button>
+            <button type="submit" name="pointType" value="Unforced Error" class="btn btn-danger m-2">Unforced Error</button>
+            <button type="submit" name="pointType" value="Forced Error" class="btn btn-danger m-2">Forced Error</button>
+            <button type="submit" name="pointType" value="Double Fault" class="btn btn-danger m-2">Double Fault</button>
+        </form>
+    </div>
+</div>

@@ -36,7 +36,8 @@ namespace MatchManagementApp.UI.Pages
                 return RedirectToPage("/Account/Login");
 
             var match = await _matchRepo.GetMatchByIdAsync(id);
-            if (match == null) return NotFound();
+            if (match == null)
+                return NotFound();
 
             var points = await _pointRepo.GetPointsByMatchIdAsync(id);
             Score = _scoreService.CalculateScore(match, points);
@@ -44,13 +45,13 @@ namespace MatchManagementApp.UI.Pages
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync(int id, string pointType)
+        public async Task<IActionResult> OnPostAsync(int id, string pointType, bool isUserWinner)
         {
             var userId = await _userService.GetCurrentUserId(User);
             if (userId == null)
                 return RedirectToPage("/Account/Login");
 
-            await _matchService.RegisterPointAsync(id, userId.Value, pointType);
+            await _matchService.RegisterPointAsync(id, userId.Value, pointType, isUserWinner);
             return RedirectToPage(new { id });
         }
     }

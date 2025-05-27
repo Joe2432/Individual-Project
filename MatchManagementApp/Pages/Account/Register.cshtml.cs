@@ -49,5 +49,6 @@ namespace MatchManagementApp.UI.Pages.Account
 
             return RedirectToPage("/Index");
         }
+
     }
 }

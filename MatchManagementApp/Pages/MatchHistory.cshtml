@@ -6,33 +6,28 @@
 
 <h2>Match History</h2>
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Match Type</th>
-            <th>Opponent(s)</th>
-            <th>Surface</th>
-            <th>Date</th>
-            <th>Score</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var summary in Model.MatchSummaries)
-        {
-            var match = summary.Match;
-            <tr>
-                <td>@match.MatchType</td>
-                <td>
-                    @match.FirstOpponentName
-                    @if (!string.IsNullOrEmpty(match.SecondOpponentName))
-                    {
-                        <span> & @match.SecondOpponentName</span>
-                    }
-                </td>
-                <td>@match.Surface</td>
-                <td>@match.MatchDate.ToShortDateString()</td>
-                <td>@summary.ScoreSummary</td>
-            </tr>
-        }
-    </tbody>
-</table>
+@if (Model.MatchSummaries.Count == 0)
+{
+    <p>You haven't played any matches yet.</p>
+}
+else
+{
+    @foreach (var summary in Model.MatchSummaries)
+    {
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Match vs @summary.Match.FirstOpponentName</h5>
+                <p class="card-text">Score: @summary.ScoreSummary</p>
+
+                @if (!summary.MatchOver)
+                {
+                    <a asp-page="/PlayMatch" asp-route-id="@summary.Match.Id" class="btn btn-warning">Continue Match</a>
+                }
+                else
+                {
+                    <span class="badge bg-success">Completed</span>
+                }
+            </div>
+        </div>
+    }
+}
