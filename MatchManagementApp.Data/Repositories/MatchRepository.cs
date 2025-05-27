@@ -9,30 +9,63 @@ public class MatchRepository : IMatchRepository
         _context = context;
     }
 
-    public async Task<int> CreateMatchAsync(MatchEntity match)
+    public async Task<int> CreateMatchAsync(MatchCreateDto dto)
     {
-        _context.Matches.Add(match);
+        var entity = new MatchEntity(
+            dto.CreatedByUserId,
+            dto.MatchType,
+            dto.FirstOpponentName,
+            dto.NrSets,
+            dto.FinalSetType,
+            dto.GameFormat,
+            dto.Surface,
+            dto.PartnerName,
+            dto.SecondOpponentName
+        );
+
+        _context.Matches.Add(entity);
         await _context.SaveChangesAsync();
-        return match.Id; // EF will auto-generate this
+
+        return entity.Id;
     }
 
-    public async Task<List<MatchEntity>> GetMatchesByUserIdAsync(int userId)
+    public async Task<List<MatchReadDto>> GetMatchesByUserIdAsync(int userId)
     {
         return await _context.Matches
             .Where(m => m.CreatedByUserId == userId)
+            .Select(m => new MatchReadDto
+            {
+                Id = m.Id,
+                MatchType = m.MatchType,
+                PartnerName = m.PartnerName,
+                FirstOpponentName = m.FirstOpponentName,
+                SecondOpponentName = m.SecondOpponentName,
+                Surface = m.Surface,
+                NrSets = m.NrSets,
+                FinalSetType = m.FinalSetType,
+                GameFormat = m.GameFormat,
+                MatchDate = m.MatchDate
+            })
             .ToListAsync();
     }
 
-    public async Task<MatchEntity?> GetMatchByIdAsync(int matchId)
+    public async Task<MatchReadDto?> GetMatchByIdAsync(int matchId)
     {
         return await _context.Matches
-            .Include(m => m.Points)
-            .FirstOrDefaultAsync(m => m.Id == matchId);
-    }
-
-    public async Task UpdateMatchAsync(MatchEntity match)
-    {
-        _context.Matches.Update(match);
-        await _context.SaveChangesAsync();
+            .Where(m => m.Id == matchId)
+            .Select(m => new MatchReadDto
+            {
+                Id = m.Id,
+                MatchType = m.MatchType,
+                PartnerName = m.PartnerName,
+                FirstOpponentName = m.FirstOpponentName,
+                SecondOpponentName = m.SecondOpponentName,
+                Surface = m.Surface,
+                NrSets = m.NrSets,
+                FinalSetType = m.FinalSetType,
+                GameFormat = m.GameFormat,
+                MatchDate = m.MatchDate
+            })
+            .FirstOrDefaultAsync();
     }
 }

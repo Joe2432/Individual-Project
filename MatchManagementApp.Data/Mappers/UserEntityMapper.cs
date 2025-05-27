@@ -1,6 +1,4 @@
-﻿using MatchManagementApp.Core.DTOs;
-
-public static class UserEntityMapper
+﻿public static class UserEntityMapper
 {
     public static UserCreateDto ToCreateDto(this UserEntity entity)
     {

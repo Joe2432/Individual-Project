@@ -1,6 +1,6 @@
 ﻿public class ScorekeepingService : IScorekeepingService
 {
-    public MatchScoreDto CalculateScore(MatchEntity match, IEnumerable<PointEntity> pointList)
+    public MatchScoreDto CalculateScore(MatchReadDto match, IEnumerable<PointReadDto> pointList)
     {
         var points = pointList.ToList(); // Ensure single enumeration
 
@@ -20,7 +20,7 @@
 
         foreach (var point in points)
         {
-            var winner = point.WinnerLabel == "User" ? 1 : 2;
+            var winner = point.IsUserWinner ? 1 : 2;
 
             if (inTiebreak)
             {
@@ -77,7 +77,7 @@
                     }
                 }
 
-                if ((p1Games == 6 && p2Games == 6))
+                if (p1Games == 6 && p2Games == 6)
                 {
                     bool isFinalSet = (p1Sets + p2Sets + 1) == match.NrSets;
 
@@ -85,7 +85,6 @@
                     {
                         inTiebreak = true;
                     }
-                    // else: final set continues normally
                 }
                 else if ((p1Games >= 6 || p2Games >= 6) && Math.Abs(p1Games - p2Games) >= 2)
                 {

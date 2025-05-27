@@ -13,16 +13,9 @@
             <thead class="table-secondary">
                 <tr>
                     <th></th>
-                    @for (int i = 0; i < Model.Score.SetScores.Count; i++)
+                    @foreach (var idx in Model.DisplaySetIndices)
                     {
-                        var set = Model.Score.SetScores[i];
-                        bool isFinalSet = i == Model.Score.SetScores.Count - 1;
-                        bool isEmptyFinalSet = isFinalSet && set.Player1Games == 0 && set.Player2Games == 0 && Model.Score.MatchOver;
-
-                        if (!isEmptyFinalSet)
-                        {
-                            <th>Set @(@i + 1)</th>
-                        }
+                        <th>Set @(idx + 1)</th>
                     }
                     <th>In Game</th>
                 </tr>
@@ -30,33 +23,19 @@
             <tbody>
                 <tr>
                     <td><strong>You</strong></td>
-                    @for (int i = 0; i < Model.Score.SetScores.Count; i++)
+                    @foreach (var games in Model.UserSetGames)
                     {
-                        var set = Model.Score.SetScores[i];
-                        bool isFinalSet = i == Model.Score.SetScores.Count - 1;
-                        bool isEmptyFinalSet = isFinalSet && set.Player1Games == 0 && set.Player2Games == 0 && Model.Score.MatchOver;
-
-                        if (!isEmptyFinalSet)
-                        {
-                            <td>@set.ToString().Split('-')[0]</td>
-                        }
+                        <td>@games</td>
                     }
-                    <td>@Model.Score.CurrentGameScore.Split('-')[0]</td>
+                    <td>@Model.GameUserDisplay</td>
                 </tr>
                 <tr>
                     <td><strong>Opponent</strong></td>
-                    @for (int i = 0; i < Model.Score.SetScores.Count; i++)
+                    @foreach (var games in Model.OpponentSetGames)
                     {
-                        var set = Model.Score.SetScores[i];
-                        bool isFinalSet = i == Model.Score.SetScores.Count - 1;
-                        bool isEmptyFinalSet = isFinalSet && set.Player1Games == 0 && set.Player2Games == 0 && Model.Score.MatchOver;
-
-                        if (!isEmptyFinalSet)
-                        {
-                            <td>@set.ToString().Split('-')[1]</td>
-                        }
+                        <td>@games</td>
                     }
-                    <td>@Model.Score.CurrentGameScore.Split('-')[1]</td>
+                    <td>@Model.GameOpponentDisplay</td>
                 </tr>
             </tbody>
         </table>

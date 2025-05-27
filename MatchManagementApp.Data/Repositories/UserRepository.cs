@@ -9,30 +9,61 @@ public class UserRepository : IUserRepository
         _context = context;
     }
 
-    public async Task<UserEntity?> GetUserByEmailAsync(string email)
+    public async Task<UserCreateDto?> GetUserByEmailAsync(string email)
     {
-        return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+        return user == null ? null : new UserCreateDto
+        {
+            Username = user.Username,
+            Email = user.Email,
+            PasswordHash = user.PasswordHash,
+            Age = user.Age,
+            Gender = user.Gender
+        };
     }
 
-    public async Task<UserEntity?> GetUserByUsernameAsync(string username)
+    public async Task<UserCreateDto?> GetUserByUsernameAsync(string username)
     {
-        return await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+        return user == null ? null : new UserCreateDto
+        {
+            Id = user.Id,
+            Username = user.Username,
+            Email = user.Email,
+            PasswordHash = user.PasswordHash,
+            Age = user.Age,
+            Gender = user.Gender
+        };
     }
 
-    public async Task<UserEntity?> GetUserByIdAsync(int userId)
+    public async Task<UserCreateDto?> GetUserByIdAsync(int userId)
     {
-        return await _context.Users.FindAsync(userId);
+        var user = await _context.Users.FindAsync(userId);
+        return user == null ? null : new UserCreateDto
+        {
+            Username = user.Username,
+            Email = user.Email,
+            PasswordHash = user.PasswordHash,
+            Age = user.Age,
+            Gender = user.Gender
+        };
     }
 
-    public async Task CreateUserAsync(UserEntity user)
+    public async Task<int> CreateUserAsync(UserCreateDto dto)
     {
-        await _context.Users.AddAsync(user);
-        await _context.SaveChangesAsync(); // This is what persists to the database
-    }
-
-    public async Task DeleteUserAsync(UserEntity user)
-    {
-        _context.Users.Remove(user);
+        var entity = new UserEntity(dto.Username, dto.Email, dto.PasswordHash, dto.Age, dto.Gender);
+        await _context.Users.AddAsync(entity);
         await _context.SaveChangesAsync();
+        return entity.Id;
+    }
+
+    public async Task DeleteUserAsync(int userId)
+    {
+        var user = await _context.Users.FindAsync(userId);
+        if (user != null)
+        {
+            _context.Users.Remove(user);
+            await _context.SaveChangesAsync();
+        }
     }
 }

@@ -9,10 +9,16 @@ public class PointRepository : IPointRepository
         _context = context;
     }
 
-    public async Task<List<PointEntity>> GetPointsByMatchIdAsync(int matchId)
+    public async Task<List<PointReadDto>> GetPointsByMatchIdAsync(int matchId)
     {
         return await _context.Points
             .Where(p => p.MatchId == matchId)
+            .Select(p => new PointReadDto
+            {
+                PointType = p.WinningMethod,
+                NumberOfShots = p.NrShots,
+                IsUserWinner = p.WinnerLabel == "User"
+            })
             .ToListAsync();
     }
 
@@ -21,16 +27,34 @@ public class PointRepository : IPointRepository
         return await _context.Points.FindAsync(pointId);
     }
 
-    public async Task AddPointAsync(PointEntity point)
+    public async Task AddPointAsync(PointCreateDto dto)
     {
-        _context.Points.Add(point);
+        var winnerLabel = dto.IsUserWinner ? "User" : "Opponent";
+
+        var entity = new PointEntity(
+            dto.MatchId,
+            winnerLabel,
+            dto.PointType,
+            dto.NumberOfShots
+        );
+
+        _context.Points.Add(entity);
         await _context.SaveChangesAsync();
     }
 
 
-    public async Task DeletePointAsync(PointEntity point)
+
+    public async Task DeleteLastPointAsync(int matchId)
     {
-        _context.Points.Remove(point);
-        await _context.SaveChangesAsync();
+        var lastPoint = await _context.Points
+            .Where(p => p.MatchId == matchId)
+            .OrderByDescending(p => p.Id)
+            .FirstOrDefaultAsync();
+
+        if (lastPoint != null)
+        {
+            _context.Points.Remove(lastPoint);
+            await _context.SaveChangesAsync();
+        }
     }
 }

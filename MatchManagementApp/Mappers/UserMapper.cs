@@ -1,5 +1,4 @@
-﻿using MatchManagementApp.Core.DTOs;
-namespace MatchManagementApp.UI.Mappers
+﻿namespace MatchManagementApp.UI.Mappers
 {
     public static class UserMapper
     {

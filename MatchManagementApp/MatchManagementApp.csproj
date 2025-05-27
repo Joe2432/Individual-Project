@@ -8,7 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MatchManagementApp.Business\MatchManagementApp.Business.csproj" />
-    <ProjectReference Include="..\MatchManagementApp.Core\MatchManagementApp.Core.csproj" />
+    <ProjectReference Include="..\MatchManagementApp.Data\MatchManagementApp.Data.csproj" />
   </ItemGroup>
 
   <ItemGroup>

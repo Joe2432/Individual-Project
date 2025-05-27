@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+
 
 namespace MatchManagementApp.UI.Pages
 {
@@ -29,7 +27,7 @@ namespace MatchManagementApp.UI.Pages
             _scoreService = scoreService;
         }
 
-        public List<(MatchEntity Match, string ScoreSummary, bool MatchOver)> MatchSummaries { get; private set; } = new();
+        public List<(MatchReadDto Match, string ScoreSummary, bool MatchOver)> MatchSummaries { get; private set; } = new();
 
         public async Task OnGetAsync()
         {

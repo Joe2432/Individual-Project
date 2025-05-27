@@ -6,28 +6,42 @@
 
 <h2>Match History</h2>
 
-@if (Model.MatchSummaries.Count == 0)
+@if (Model.MatchSummaries.Any())
 {
-    <p>You haven't played any matches yet.</p>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Opponent</th>
+                <th>Surface</th>
+                <th>Score</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var (match, scoreSummary, matchOver) in Model.MatchSummaries)
+            {
+                <tr>
+                    <td>@match.FirstOpponentName</td>
+                    <td>@match.Surface</td>
+                    <td>@scoreSummary</td>
+                    <td>@(matchOver ? "Completed" : "In Progress")</td>
+                    <td>
+                        @if (!matchOver)
+                        {
+                            <a class="btn btn-primary btn-sm" asp-page="/PlayMatch" asp-route-id="@match.Id">Continue</a>
+                        }
+                        else
+                        {
+                            <span class="text-muted">-</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
 }
 else
 {
-    @foreach (var summary in Model.MatchSummaries)
-    {
-        <div class="card mb-3">
-            <div class="card-body">
-                <h5 class="card-title">Match vs @summary.Match.FirstOpponentName</h5>
-                <p class="card-text">Score: @summary.ScoreSummary</p>
-
-                @if (!summary.MatchOver)
-                {
-                    <a asp-page="/PlayMatch" asp-route-id="@summary.Match.Id" class="btn btn-warning">Continue Match</a>
-                }
-                else
-                {
-                    <span class="badge bg-success">Completed</span>
-                }
-            </div>
-        </div>
-    }
+    <p>No matches found.</p>
 }
