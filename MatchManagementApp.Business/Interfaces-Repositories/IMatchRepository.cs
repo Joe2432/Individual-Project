@@ -1,6 +1,6 @@
 ﻿public interface IMatchRepository
 {
-    Task<int> CreateMatchAsync(MatchCreateDto dto);
-    Task<List<MatchReadDto>> GetMatchesByUserIdAsync(int userId);
-    Task<MatchReadDto?> GetMatchByIdAsync(int matchId);
+    Task<int> CreateMatchAsync(MatchDto dto);
+    Task<List<MatchDto>> GetMatchesByUserIdAsync(int userId);
+    Task<MatchDto?> GetMatchByIdAsync(int matchId);
 }

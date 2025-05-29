@@ -9,10 +9,10 @@ public class UserRepository : IUserRepository
         _context = context;
     }
 
-    public async Task<UserCreateDto?> GetUserByEmailAsync(string email)
+    public async Task<UserDto?> GetUserByEmailAsync(string email)
     {
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
-        return user == null ? null : new UserCreateDto
+        return user == null ? null : new UserDto
         {
             Username = user.Username,
             Email = user.Email,
@@ -22,10 +22,10 @@ public class UserRepository : IUserRepository
         };
     }
 
-    public async Task<UserCreateDto?> GetUserByUsernameAsync(string username)
+    public async Task<UserDto?> GetUserByUsernameAsync(string username)
     {
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
-        return user == null ? null : new UserCreateDto
+        return user == null ? null : new UserDto
         {
             Id = user.Id,
             Username = user.Username,
@@ -36,10 +36,10 @@ public class UserRepository : IUserRepository
         };
     }
 
-    public async Task<UserCreateDto?> GetUserByIdAsync(int userId)
+    public async Task<UserDto?> GetUserByIdAsync(int userId)
     {
         var user = await _context.Users.FindAsync(userId);
-        return user == null ? null : new UserCreateDto
+        return user == null ? null : new UserDto
         {
             Username = user.Username,
             Email = user.Email,
@@ -49,7 +49,7 @@ public class UserRepository : IUserRepository
         };
     }
 
-    public async Task<int> CreateUserAsync(UserCreateDto dto)
+    public async Task<int> CreateUserAsync(UserDto dto)
     {
         var entity = new UserEntity(dto.Username, dto.Email, dto.PasswordHash, dto.Age, dto.Gender);
         await _context.Users.AddAsync(entity);

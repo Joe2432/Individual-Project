@@ -1,16 +1,17 @@
 ﻿using System.Security.Claims;
+using System.Threading.Tasks;
 
 public interface IUserService
 {
-    Task<UserCreateDto?> GetUserByEmailAsync(string email);
-    Task<UserCreateDto?> GetUserByUsernameAsync(string username);
-    Task<UserCreateDto?> GetUserEntityByUsernameAsync(string username);
+    Task<UserDto?> GetUserByEmailAsync(string email);
+    Task<UserDto?> GetUserByUsernameAsync(string username);
+    Task<UserDto?> GetUserEntityByUsernameAsync(string username);
     bool VerifyPassword(string hash, string raw);
-    Task CreateUserAsync(UserCreateDto dto);
+    Task CreateUserAsync(UserDto dto);
     Task<int?> GetCurrentUserId(ClaimsPrincipal principal);
-    Task<UserCreateDto> GetUserViewModelAsync(int userId);
+    Task<UserDto> GetUserViewModelAsync(int userId);
     Task DeleteUserAsync(int userId);
-    Task<SignInResult> TrySignInAsync(string username, string password);
-    Task<RegisterResult> TryRegisterAsync(UserCreateDto userDto);
-    Task<UserReadDto?> GetUserByIdAsync(int userId);
+    Task<AuthResultDto> TrySignInAsync(string username, string password);
+    Task<AuthResultDto> TryRegisterAsync(UserDto userDto);
+    Task<UserDto?> GetUserByIdAsync(int userId);
 }

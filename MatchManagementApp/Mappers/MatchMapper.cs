@@ -1,18 +1,19 @@
 ﻿public static class MatchMapper
 {
-    public static MatchCreateDto ToCreateDto(MatchCreationViewModel vm, int userId)
+    public static MatchDto ToCreateDto(MatchCreationViewModel viewModel, int userId)
     {
-        return new MatchCreateDto
+        return new MatchDto
         {
             CreatedByUserId = userId,
-            MatchType = vm.MatchType,
-            PartnerName = vm.PartnerName,
-            FirstOpponentName = vm.FirstOpponentName,
-            SecondOpponentName = vm.SecondOpponentName,
-            NrSets = vm.NrSets,
-            FinalSetType = vm.FinalSetType,
-            GameFormat = vm.GameFormat,
-            Surface = vm.Surface
+            MatchType = viewModel.MatchType,
+            PartnerName = viewModel.PartnerName,
+            FirstOpponentName = viewModel.FirstOpponentName,
+            SecondOpponentName = viewModel.SecondOpponentName,
+            Surface = viewModel.Surface,
+            NrSets = viewModel.NrSets,
+            FinalSetType = viewModel.FinalSetType,
+            GameFormat = viewModel.GameFormat
         };
     }
+
 }

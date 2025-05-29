@@ -27,7 +27,17 @@
                     {
                         <td>@games</td>
                     }
-                    <td>@Model.ViewModel.GameUserDisplay</td>
+                    <td>
+                        @if (Model.ViewModel.Score.InTiebreak && Model.ViewModel.Score.CurrentGameScore.Contains('-'))
+                        {
+                            var parts = Model.ViewModel.Score.CurrentGameScore.Split('-');
+                            @parts[0].Trim()
+                        }
+                        else
+                        {
+                            @Model.ViewModel.GameUserDisplay
+                        }
+                    </td>
                 </tr>
                 <tr>
                     <td><strong>Opponent</strong></td>
@@ -35,7 +45,17 @@
                     {
                         <td>@games</td>
                     }
-                    <td>@Model.ViewModel.GameOpponentDisplay</td>
+                    <td>
+                        @if (Model.ViewModel.Score.InTiebreak && Model.ViewModel.Score.CurrentGameScore.Contains('-'))
+                        {
+                            var parts = Model.ViewModel.Score.CurrentGameScore.Split('-');
+                            @parts[1].Trim()
+                        }
+                        else
+                        {
+                            @Model.ViewModel.GameOpponentDisplay
+                        }
+                    </td>
                 </tr>
             </tbody>
         </table>

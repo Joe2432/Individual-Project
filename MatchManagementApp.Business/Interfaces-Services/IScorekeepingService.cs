@@ -1,4 +1,6 @@
-﻿public interface IScorekeepingService
+﻿using System.Collections.Generic;
+
+public interface IScorekeepingService
 {
-    MatchScoreDto CalculateScore(MatchReadDto match, IEnumerable<PointReadDto> points);
+    MatchScoreDto CalculateScore(MatchDto match, IEnumerable<PointDto> points);
 }

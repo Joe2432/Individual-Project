@@ -1,8 +1,8 @@
 ﻿    public static class UserMapper
     {
-        public static UserCreateDto ToCreateDto(UserRegistrationViewModel vm)
+        public static UserDto ToCreateDto(UserRegistrationViewModel vm)
         {
-            return new UserCreateDto
+            return new UserDto
             {
                 Username = vm.Username,
                 Email = vm.Email,
@@ -12,7 +12,7 @@
             };
         }
 
-        public static UserRegistrationViewModel ToRegistrationViewModel(UserReadDto dto)
+        public static UserRegistrationViewModel ToRegistrationViewModel(UserDto dto)
         {
             return new UserRegistrationViewModel
             {

@@ -9,7 +9,7 @@ public class MatchRepository : IMatchRepository
         _context = context;
     }
 
-    public async Task<int> CreateMatchAsync(MatchCreateDto dto)
+    public async Task<int> CreateMatchAsync(MatchDto dto)
     {
         var entity = new MatchEntity(
             dto.CreatedByUserId,
@@ -29,11 +29,11 @@ public class MatchRepository : IMatchRepository
         return entity.Id;
     }
 
-    public async Task<List<MatchReadDto>> GetMatchesByUserIdAsync(int userId)
+    public async Task<List<MatchDto>> GetMatchesByUserIdAsync(int userId)
     {
         return await _context.Matches
             .Where(m => m.CreatedByUserId == userId)
-            .Select(m => new MatchReadDto
+            .Select(m => new MatchDto
             {
                 Id = m.Id,
                 MatchType = m.MatchType,
@@ -49,11 +49,11 @@ public class MatchRepository : IMatchRepository
             .ToListAsync();
     }
 
-    public async Task<MatchReadDto?> GetMatchByIdAsync(int matchId)
+    public async Task<MatchDto?> GetMatchByIdAsync(int matchId)
     {
         return await _context.Matches
             .Where(m => m.Id == matchId)
-            .Select(m => new MatchReadDto
+            .Select(m => new MatchDto
             {
                 Id = m.Id,
                 MatchType = m.MatchType,

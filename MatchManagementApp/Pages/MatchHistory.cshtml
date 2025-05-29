@@ -6,30 +6,65 @@
 
 <h2>Match History</h2>
 
+<form method="get" class="mb-4">
+    <div class="form-row row g-2">
+        <div class="col">
+            <input type="text" name="SearchName" class="form-control" value="@Model.SearchName" placeholder="Search by name" />
+        </div>
+        <div class="col">
+            <input type="text" name="SearchType" class="form-control" value="@Model.SearchType" placeholder="Search by type" />
+        </div>
+        <div class="col">
+            <input type="text" name="SearchSurface" class="form-control" value="@Model.SearchSurface" placeholder="Search by surface" />
+        </div>
+        <div class="col">
+            <input type="date" name="SearchDate" class="form-control" value="@Model.SearchDate?.ToString("yyyy-MM-dd")" />
+        </div>
+        <div class="col">
+            <input type="date" name="DateFrom" class="form-control" value="@Model.DateFrom?.ToString("yyyy-MM-dd")" />
+        </div>
+        <div class="col">
+            <input type="date" name="DateTo" class="form-control" value="@Model.DateTo?.ToString("yyyy-MM-dd")" />
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">Search</button>
+        </div>
+    </div>
+</form>
+
 @if (Model.MatchSummaries.Any())
 {
-    <table class="table table-striped">
-        <thead>
+    <table class="table table-bordered table-striped">
+        <thead class="thead-dark">
             <tr>
-                <th>Opponent</th>
+                <th>Match Type</th>
+                <th>Partner</th>
+                <th>Opponent 1</th>
+                <th>Opponent 2</th>
                 <th>Surface</th>
                 <th>Score</th>
                 <th>Status</th>
+                <th>Date</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var summary in Model.MatchSummaries)
+            @foreach (var m in Model.MatchSummaries)
             {
                 <tr>
-                    <td>@summary.Match.FirstOpponentName</td>
-                    <td>@summary.Match.Surface</td>
-                    <td>@summary.ScoreSummary</td>
-                    <td>@(summary.MatchOver ? "Completed" : "In Progress")</td>
+                    <td>@m.MatchType</td>
+                    <td>@m.PartnerName</td>
+                    <td>@m.FirstOpponentName</td>
+                    <td>@m.SecondOpponentName</td>
+                    <td>@m.Surface</td>
+                    <td>@m.ScoreSummary</td>
+                    <td>@m.Status</td>
+                    <td>@m.CreatedDate.ToString("yyyy-MM-dd")</td>
                     <td>
-                        @if (!summary.MatchOver)
+                        <a asp-page="/MatchDetails" asp-route-id="@m.MatchId" class="btn btn-outline-secondary btn-sm">Details</a>
+                        @if (!m.MatchOver)
                         {
-                            <a class="btn btn-primary btn-sm" asp-page="/PlayMatch" asp-route-id="@summary.Match.Id">Continue</a>
+                            <a asp-page="/PlayMatch" asp-route-id="@m.MatchId" class="btn btn-primary btn-sm ml-1">Continue</a>
                         }
                         else
                         {
@@ -38,7 +73,6 @@
                     </td>
                 </tr>
             }
-
         </tbody>
     </table>
 }

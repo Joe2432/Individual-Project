@@ -22,7 +22,7 @@ public class MatchService : IMatchService
         _scorekeepingService = scorekeepingService;
     }
 
-    public async Task<int> CreateMatchAsync(MatchCreateDto dto)
+    public async Task<int> CreateMatchAsync(MatchDto dto)
     {
         Console.WriteLine($"[MatchService] Received match creation request for user ID: {dto.CreatedByUserId}");
 
@@ -38,7 +38,7 @@ public class MatchService : IMatchService
         return await _matchRepository.CreateMatchAsync(dto);
     }
 
-    public async Task<List<MatchReadDto>> GetUserMatchesAsync(int userId)
+    public async Task<List<MatchDto>> GetUserMatchesAsync(int userId)
     {
         Console.WriteLine($"[MatchService] Fetching matches for user ID: {userId}");
         return await _matchRepository.GetMatchesByUserIdAsync(userId);
@@ -75,7 +75,7 @@ public class MatchService : IMatchService
             return;
         }
 
-        var point = new PointCreateDto
+        var point = new PointDto
         {
             MatchId = matchId,
             PointType = pointType,
@@ -93,7 +93,6 @@ public class MatchService : IMatchService
         await _pointRepository.DeleteLastPointAsync(matchId);
     }
 
-    // ----------- NEW: Implement required interface members -------------
 
     public async Task<PlayMatchDto?> GetPlayMatchDtoAsync(int matchId, int userId)
     {
@@ -149,9 +148,41 @@ public class MatchService : IMatchService
         };
     }
 
-    public async Task<List<MatchHistoryDto>> GetMatchHistorySummariesAsync(int userId)
+    public async Task<List<MatchHistoryDto>> GetMatchHistorySummariesAsync(
+        int userId,
+        string? name = null,
+        string? type = null,
+        string? surface = null,
+        DateTime? date = null,
+        DateTime? dateFrom = null,
+        DateTime? dateTo = null)
     {
         var matches = await _matchRepository.GetMatchesByUserIdAsync(userId);
+
+        if (!string.IsNullOrWhiteSpace(name))
+        {
+            matches = matches.Where(m =>
+                (!string.IsNullOrWhiteSpace(m.FirstOpponentName) && m.FirstOpponentName.Contains(name, StringComparison.OrdinalIgnoreCase)) ||
+                (!string.IsNullOrWhiteSpace(m.SecondOpponentName) && m.SecondOpponentName.Contains(name, StringComparison.OrdinalIgnoreCase)) ||
+                (!string.IsNullOrWhiteSpace(m.PartnerName) && m.PartnerName.Contains(name, StringComparison.OrdinalIgnoreCase))
+            ).ToList();
+        }
+
+        if (!string.IsNullOrWhiteSpace(type))
+            matches = matches.Where(m => m.MatchType.Equals(type, StringComparison.OrdinalIgnoreCase)).ToList();
+
+        if (!string.IsNullOrWhiteSpace(surface))
+            matches = matches.Where(m => m.Surface.Equals(surface, StringComparison.OrdinalIgnoreCase)).ToList();
+
+        if (date.HasValue)
+            matches = matches.Where(m => m.MatchDate == date.Value.Date).ToList();
+
+        if (dateFrom.HasValue)
+            matches = matches.Where(m => m.MatchDate >= dateFrom.Value.Date).ToList();
+
+        if (dateTo.HasValue)
+            matches = matches.Where(m => m.MatchDate <= dateTo.Value.Date).ToList();
+
         var summaries = new List<MatchHistoryDto>();
 
         foreach (var match in matches)
@@ -173,4 +204,5 @@ public class MatchService : IMatchService
 
         return summaries;
     }
+
 }

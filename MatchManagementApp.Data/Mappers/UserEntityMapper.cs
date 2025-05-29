@@ -1,8 +1,8 @@
 ﻿public static class UserEntityMapper
 {
-    public static UserCreateDto ToCreateDto(this UserEntity entity)
+    public static UserDto ToCreateDto(this UserEntity entity)
     {
-        return new UserCreateDto
+        return new UserDto
         {
             Username = entity.Username,
             Email = entity.Email,
@@ -12,7 +12,7 @@
         };
     }
 
-    public static UserEntity ToEntity(this UserCreateDto dto, string hashedPassword)
+    public static UserEntity ToEntity(this UserDto dto, string hashedPassword)
     {
         return new UserEntity(
             dto.Username,

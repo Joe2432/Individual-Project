@@ -1,8 +1,8 @@
 ﻿public static class PointMapper
 {
-    public static PointCreateDto ToCreateDto(PointInputViewModel vm)
+    public static PointDto ToCreateDto(PointInputViewModel vm)
     {
-        return new PointCreateDto
+        return new PointDto
         {
             MatchId = vm.MatchId,
             PointType = vm.PointType,

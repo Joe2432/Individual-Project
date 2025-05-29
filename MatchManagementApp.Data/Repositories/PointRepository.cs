@@ -9,11 +9,11 @@ public class PointRepository : IPointRepository
         _context = context;
     }
 
-    public async Task<List<PointReadDto>> GetPointsByMatchIdAsync(int matchId)
+    public async Task<List<PointDto>> GetPointsByMatchIdAsync(int matchId)
     {
         return await _context.Points
             .Where(p => p.MatchId == matchId)
-            .Select(p => new PointReadDto
+            .Select(p => new PointDto
             {
                 PointType = p.WinningMethod,
                 NumberOfShots = p.NrShots,
@@ -27,7 +27,7 @@ public class PointRepository : IPointRepository
         return await _context.Points.FindAsync(pointId);
     }
 
-    public async Task AddPointAsync(PointCreateDto dto)
+    public async Task AddPointAsync(PointDto dto)
     {
         var winnerLabel = dto.IsUserWinner ? "User" : "Opponent";
 

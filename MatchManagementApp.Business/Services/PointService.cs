@@ -1,6 +1,6 @@
-﻿using System.Security.Claims;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 public class PointService : IPointService
@@ -14,7 +14,7 @@ public class PointService : IPointService
         _userService = userService;
     }
 
-    public async Task RegisterPointAsync(PointCreateDto dto, ClaimsPrincipal user)
+    public async Task RegisterPointAsync(PointDto dto, ClaimsPrincipal user)
     {
         var userId = await _userService.GetCurrentUserId(user)
             ?? throw new InvalidOperationException("User not logged in.");
@@ -22,7 +22,7 @@ public class PointService : IPointService
         await _pointRepository.AddPointAsync(dto);
     }
 
-    public async Task<List<PointReadDto>> GetPointsForMatchAsync(int matchId, ClaimsPrincipal user)
+    public async Task<List<PointDto>> GetPointsForMatchAsync(int matchId, ClaimsPrincipal user)
     {
         return await _pointRepository.GetPointsByMatchIdAsync(matchId);
     }

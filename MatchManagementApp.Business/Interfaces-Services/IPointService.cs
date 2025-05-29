@@ -2,6 +2,6 @@
 
 public interface IPointService
 {
-    Task RegisterPointAsync(PointCreateDto dto, ClaimsPrincipal user);
-    Task<List<PointReadDto>> GetPointsForMatchAsync(int matchId, ClaimsPrincipal user);
+    Task RegisterPointAsync(PointDto dto, ClaimsPrincipal user);
+    Task<List<PointDto>> GetPointsForMatchAsync(int matchId, ClaimsPrincipal user);
 }

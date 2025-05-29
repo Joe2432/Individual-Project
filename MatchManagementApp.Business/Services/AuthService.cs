@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 
 public class AuthService : IAuthService
 {
-    public ClaimsPrincipal GetClaimsPrincipal(UserCreateDto user)
+    public ClaimsPrincipal GetClaimsPrincipal(UserDto user)
     {
         var claims = new List<Claim>
     {

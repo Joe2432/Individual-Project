@@ -1,8 +1,10 @@
-﻿public interface IUserRepository
+﻿using System.Threading.Tasks;
+
+public interface IUserRepository
 {
-    Task<UserCreateDto?> GetUserByEmailAsync(string email);
-    Task<UserCreateDto?> GetUserByUsernameAsync(string username);
-    Task<UserCreateDto?> GetUserByIdAsync(int userId);
-    Task<int> CreateUserAsync(UserCreateDto dto);
+    Task<UserDto?> GetUserByEmailAsync(string email);
+    Task<UserDto?> GetUserByUsernameAsync(string username);
+    Task<UserDto?> GetUserByIdAsync(int userId);
+    Task<int> CreateUserAsync(UserDto dto);
     Task DeleteUserAsync(int userId);
 }

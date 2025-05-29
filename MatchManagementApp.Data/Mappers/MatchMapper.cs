@@ -1,6 +1,6 @@
 ﻿public static class MatchMapper
 {
-    public static MatchEntity ToEntity(this MatchCreateDto dto)
+    public static MatchEntity ToEntity(this MatchDto dto)
     {
         var match = new MatchEntity(
             dto.CreatedByUserId,
@@ -17,9 +17,9 @@
         return match;
     }
 
-    public static MatchCreateDto ToDto(this MatchEntity entity)
+    public static MatchDto ToDto(this MatchEntity entity)
     {
-        return new MatchCreateDto
+        return new MatchDto
         {
             CreatedByUserId = entity.CreatedByUserId,
             MatchType = entity.MatchType,

@@ -1,6 +1,6 @@
 ﻿public class MatchHistoryDto
 {
-    public MatchReadDto Match { get; set; }
-    public string ScoreSummary { get; set; }
+    public MatchDto Match { get; set; }
+    public string ScoreSummary { get; set; } = string.Empty;
     public bool MatchOver { get; set; }
 }
