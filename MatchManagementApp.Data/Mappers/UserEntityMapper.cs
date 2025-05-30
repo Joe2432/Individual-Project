@@ -4,9 +4,10 @@
     {
         return new UserDto
         {
+            Id = entity.Id,
             Username = entity.Username,
             Email = entity.Email,
-            Password = entity.PasswordHash, // Note: hashed already
+            PasswordHash = entity.PasswordHash, // ✅ Corrected
             Age = entity.Age,
             Gender = entity.Gender
         };
@@ -23,6 +24,4 @@
             "/images/default-user.png"
         );
     }
-
-
 }

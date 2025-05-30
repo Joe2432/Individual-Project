@@ -15,6 +15,7 @@
                 ScoreSummary = dto.ScoreSummary,
                 MatchOver = dto.MatchOver,
                 Status = dto.MatchOver ? "Completed" : "In Progress",
+                MatchDate = dto.MatchDate
             };
         }
     }

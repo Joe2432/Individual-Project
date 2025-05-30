@@ -198,8 +198,10 @@ public class MatchService : IMatchService
             {
                 Match = match,
                 ScoreSummary = formatted,
-                MatchOver = score.MatchOver
+                MatchOver = score.MatchOver,
+                MatchDate = match.MatchDate
             });
+
         }
 
         return summaries;

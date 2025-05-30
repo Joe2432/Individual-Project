@@ -15,4 +15,5 @@
         var winnerLabel = dto.IsUserWinner ? "User" : "Opponent";
         return new PointEntity(dto.MatchId, winnerLabel, dto.PointType, dto.NumberOfShots);
     }
+
 }

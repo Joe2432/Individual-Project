@@ -59,7 +59,7 @@
                     <td>@m.Surface</td>
                     <td>@m.ScoreSummary</td>
                     <td>@m.Status</td>
-                    <td>@m.CreatedDate.ToString("yyyy-MM-dd")</td>
+                    <td>@(m.MatchDate?.ToString("dd MMM yyyy") ?? "-")</td>
                     <td>
                         <a asp-page="/MatchDetails" asp-route-id="@m.MatchId" class="btn btn-outline-secondary btn-sm">Details</a>
                         @if (!m.MatchOver)

@@ -21,6 +21,7 @@
     {
         return new MatchDto
         {
+            Id = entity.Id,
             CreatedByUserId = entity.CreatedByUserId,
             MatchType = entity.MatchType,
             PartnerName = entity.PartnerName,
@@ -29,7 +30,8 @@
             NrSets = entity.NrSets,
             FinalSetType = entity.FinalSetType,
             GameFormat = entity.GameFormat,
-            Surface = entity.Surface
+            Surface = entity.Surface,
+            MatchDate = entity.MatchDate
         };
     }
 }

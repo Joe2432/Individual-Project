@@ -29,18 +29,12 @@ public class PointRepository : IPointRepository
 
     public async Task AddPointAsync(PointDto dto)
     {
-        var winnerLabel = dto.IsUserWinner ? "User" : "Opponent";
-
-        var entity = new PointEntity(
-            dto.MatchId,
-            winnerLabel,
-            dto.PointType,
-            dto.NumberOfShots
-        );
+        var entity = dto.ToEntity();
 
         _context.Points.Add(entity);
         await _context.SaveChangesAsync();
     }
+
 
 
 

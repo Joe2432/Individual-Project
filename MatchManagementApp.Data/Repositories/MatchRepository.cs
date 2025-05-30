@@ -11,17 +11,7 @@ public class MatchRepository : IMatchRepository
 
     public async Task<int> CreateMatchAsync(MatchDto dto)
     {
-        var entity = new MatchEntity(
-            dto.CreatedByUserId,
-            dto.MatchType,
-            dto.FirstOpponentName,
-            dto.NrSets,
-            dto.FinalSetType,
-            dto.GameFormat,
-            dto.Surface,
-            dto.PartnerName,
-            dto.SecondOpponentName
-        );
+        var entity = dto.ToEntity();
 
         _context.Matches.Add(entity);
         await _context.SaveChangesAsync();
@@ -31,41 +21,19 @@ public class MatchRepository : IMatchRepository
 
     public async Task<List<MatchDto>> GetMatchesByUserIdAsync(int userId)
     {
-        return await _context.Matches
+        var entities = await _context.Matches
             .Where(m => m.CreatedByUserId == userId)
-            .Select(m => new MatchDto
-            {
-                Id = m.Id,
-                MatchType = m.MatchType,
-                PartnerName = m.PartnerName,
-                FirstOpponentName = m.FirstOpponentName,
-                SecondOpponentName = m.SecondOpponentName,
-                Surface = m.Surface,
-                NrSets = m.NrSets,
-                FinalSetType = m.FinalSetType,
-                GameFormat = m.GameFormat,
-                MatchDate = m.MatchDate
-            })
             .ToListAsync();
+
+        return entities.Select(m => m.ToDto()).ToList();
     }
 
     public async Task<MatchDto?> GetMatchByIdAsync(int matchId)
     {
-        return await _context.Matches
-            .Where(m => m.Id == matchId)
-            .Select(m => new MatchDto
-            {
-                Id = m.Id,
-                MatchType = m.MatchType,
-                PartnerName = m.PartnerName,
-                FirstOpponentName = m.FirstOpponentName,
-                SecondOpponentName = m.SecondOpponentName,
-                Surface = m.Surface,
-                NrSets = m.NrSets,
-                FinalSetType = m.FinalSetType,
-                GameFormat = m.GameFormat,
-                MatchDate = m.MatchDate
-            })
-            .FirstOrDefaultAsync();
+        var entity = await _context.Matches
+            .FirstOrDefaultAsync(m => m.Id == matchId);
+
+        return entity?.ToDto();
     }
+
 }

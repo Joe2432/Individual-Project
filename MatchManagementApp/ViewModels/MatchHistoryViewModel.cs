@@ -9,5 +9,5 @@
 	public string ScoreSummary { get; set; } = string.Empty;
 	public string Status { get; set; } = "In Progress";
 	public bool MatchOver { get; set; }
-	public DateTime CreatedDate { get; set; }
+    public DateTime? MatchDate { get; set; }
 }
