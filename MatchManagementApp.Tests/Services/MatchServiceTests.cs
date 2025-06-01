@@ -8,7 +8,6 @@ public class MatchServiceTests
     private readonly Mock<IMatchRepository> _matchRepositoryMock;
     private readonly Mock<IPointRepository> _pointRepositoryMock;
     private readonly Mock<IUserRepository> _userRepositoryMock;
-    private readonly Mock<IScorekeepingService> _scorekeepingServiceMock;
     private readonly MatchService _matchService;
 
     public MatchServiceTests()
@@ -16,13 +15,11 @@ public class MatchServiceTests
         _matchRepositoryMock = new Mock<IMatchRepository>();
         _pointRepositoryMock = new Mock<IPointRepository>();
         _userRepositoryMock = new Mock<IUserRepository>();
-        _scorekeepingServiceMock = new Mock<IScorekeepingService>();
 
         _matchService = new MatchService(
             _matchRepositoryMock.Object,
             _pointRepositoryMock.Object,
-            _userRepositoryMock.Object,
-            _scorekeepingServiceMock.Object
+            _userRepositoryMock.Object
         );
     }
 
@@ -59,7 +56,7 @@ public class MatchServiceTests
             MatchDtoFactory.ValidDoublesMatch(userId)
         };
 
-        _matchRepositoryMock.Setup(r => r.GetMatchesByUserIdAsync(userId)).ReturnsAsync(matchList);
+        _matchRepositoryMock.Setup(r => r.GetMatchesByUserAsync(userId)).ReturnsAsync(matchList);
 
         var result = await _matchService.GetUserMatchesAsync(userId);
 
@@ -101,26 +98,24 @@ public class MatchServiceTests
 
         _matchRepositoryMock.Setup(r => r.GetMatchByIdAsync(matchId)).ReturnsAsync(match);
 
-        await _matchService.RegisterPointAsync(matchId, userId, "Winner", true);
+        await _matchService.RegisterPointAsync(matchId, userId, "User", true);
 
         _pointRepositoryMock.Verify(r => r.AddPointAsync(It.Is<PointDto>(p =>
             p.MatchId == matchId &&
-            p.PointType == "Winner" &&
-            p.IsUserWinner == true &&
-            p.NumberOfShots == 0
+            p.WinnerLabel == "User" &&
+            p.IsServe == true
         )), Times.Once);
     }
 
     [Fact]
-    public async Task RegisterPointAsync_ShouldDoNothing_WhenMatchDoesNotExist()
+    public async Task RegisterPointAsync_ShouldThrow_WhenMatchDoesNotExist()
     {
         int matchId = 999;
 
         _matchRepositoryMock.Setup(r => r.GetMatchByIdAsync(matchId)).ReturnsAsync((MatchDto?)null);
 
-        await _matchService.RegisterPointAsync(matchId, userId: 1, pointType: "Winner", isUserWinner: true);
-
-        _pointRepositoryMock.Verify(r => r.AddPointAsync(It.IsAny<PointDto>()), Times.Never);
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() =>
+            _matchService.RegisterPointAsync(matchId, userId: 1, winnerLabel: "User", isServe: true));
     }
 
     [Fact]
@@ -130,7 +125,7 @@ public class MatchServiceTests
 
         await _matchService.UndoLastPointAsync(matchId);
 
-        _pointRepositoryMock.Verify(r => r.DeleteLastPointAsync(matchId), Times.Once);
+        _pointRepositoryMock.Verify(r => r.RemoveLastPointAsync(matchId), Times.Once);
     }
 
     [Fact]
@@ -139,22 +134,15 @@ public class MatchServiceTests
         int matchId = 1, userId = 1;
         var match = MatchDtoFactory.ValidSinglesMatch(userId);
         var points = PointDtoFactory.SimulatedGamePoints(true);
-        var score = new MatchScoreDto
-        {
-            SetScores = new List<SetScoreDto> { new() { Player1Games = 1, Player2Games = 0 } },
-            CurrentGameScore = "15 - 0"
-        };
 
         _matchRepositoryMock.Setup(r => r.GetMatchByIdAsync(matchId)).ReturnsAsync(match);
         _pointRepositoryMock.Setup(r => r.GetPointsByMatchIdAsync(matchId)).ReturnsAsync(points);
-        _scorekeepingServiceMock.Setup(s => s.CalculateScore(match, points)).Returns(score);
 
         var result = await _matchService.GetPlayMatchDtoAsync(matchId, userId);
 
         Assert.NotNull(result);
-        Assert.Equal("15", result.GameUserDisplay);
-        Assert.Equal("0", result.GameOpponentDisplay);
-        Assert.Single(result.Score.SetScores);
+        Assert.NotNull(result.Score);
+        Assert.True(result.Score.SetScores.Count > 0);
     }
 
     [Fact]

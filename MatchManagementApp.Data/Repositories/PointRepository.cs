@@ -38,7 +38,7 @@ public class PointRepository : IPointRepository
 
 
 
-    public async Task DeleteLastPointAsync(int matchId)
+    public async Task RemoveLastPointAsync(int matchId)
     {
         var lastPoint = await _context.Points
             .Where(p => p.MatchId == matchId)
@@ -51,4 +51,5 @@ public class PointRepository : IPointRepository
             await _context.SaveChangesAsync();
         }
     }
+
 }

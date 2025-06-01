@@ -1,20 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-public class ScorekeepingService : IScorekeepingService
+﻿public static class MatchScoringEngine
 {
     private const int GAMES_TO_WIN_SET = 6;
     private const int SET_TIEBREAK_MIN_GAMES = 6;
     private const int TIEBREAK_POINTS = 7;
     private const int SUPER_TIEBREAK_POINTS = 10;
 
-    public MatchScoreDto CalculateScore(MatchDto match, IEnumerable<PointDto> pointList)
+    public static MatchScore Calculate(Match match)
     {
-        var points = pointList.ToList();
-        var result = new MatchScoreDto();
-        var sets = new List<SetScoreDto> { new() };
+        var result = new MatchScore();
+        var sets = new List<SetScore> { new() };
 
+        var points = match.Points;
         int maxSets = match.NrSets;
         int setsToWin = (maxSets + 1) / 2;
         bool noAd = match.GameFormat.Equals("NoAd", StringComparison.OrdinalIgnoreCase);
@@ -32,7 +28,7 @@ public class ScorekeepingService : IScorekeepingService
 
         foreach (var point in points)
         {
-            var winner = point.IsUserWinner ? 1 : 2;
+            int winner = point.IsUserWinner ? 1 : 2;
 
             bool isFinalSet = (p1Sets + p2Sets + 1) == maxSets;
             if (isFinalSet && maxiTiebreakFinalSet)
@@ -52,9 +48,7 @@ public class ScorekeepingService : IScorekeepingService
                     && Math.Abs(p1Tiebreak - p2Tiebreak) >= 2)
                 {
                     if (p1Tiebreak > p2Tiebreak) p1Sets++; else p2Sets++;
-                    sets[setIndex].Player1Games = p1Tiebreak;
-                    sets[setIndex].Player2Games = p2Tiebreak;
-                    sets[setIndex].TiebreakScore = null;
+                    sets[setIndex] = new SetScore(p1Tiebreak, p2Tiebreak);
                     matchOver = true;
                     break;
                 }
@@ -67,16 +61,14 @@ public class ScorekeepingService : IScorekeepingService
                     && Math.Abs(p1Tiebreak - p2Tiebreak) >= 2)
                 {
                     if (p1Tiebreak > p2Tiebreak) p1Games++; else p2Games++;
-                    sets[setIndex].Player1Games = p1Games;
-                    sets[setIndex].Player2Games = p2Games;
-                    sets[setIndex].TiebreakScore = Math.Min(p1Tiebreak, p2Tiebreak);
+                    sets[setIndex] = new SetScore(p1Games, p2Games, Math.Min(p1Tiebreak, p2Tiebreak));
 
                     if (p1Games > p2Games) p1Sets++; else p2Sets++;
 
                     p1Games = p2Games = p1Tiebreak = p2Tiebreak = 0;
                     setIndex++;
                     if (p1Sets < setsToWin && p2Sets < setsToWin && (p1Sets + p2Sets) < maxSets)
-                        sets.Add(new SetScoreDto());
+                        sets.Add(new SetScore());
 
                     inTiebreak = false;
                 }
@@ -106,12 +98,11 @@ public class ScorekeepingService : IScorekeepingService
                     && Math.Abs(p1Games - p2Games) >= 2)
                 {
                     if (p1Games > p2Games) p1Sets++; else p2Sets++;
-                    sets[setIndex].Player1Games = p1Games;
-                    sets[setIndex].Player2Games = p2Games;
+                    sets[setIndex] = new SetScore(p1Games, p2Games);
                     p1Games = p2Games = 0;
                     setIndex++;
                     if (p1Sets < setsToWin && p2Sets < setsToWin && (p1Sets + p2Sets) < maxSets)
-                        sets.Add(new SetScoreDto());
+                        sets.Add(new SetScore());
                 }
             }
 
@@ -125,14 +116,15 @@ public class ScorekeepingService : IScorekeepingService
 
         if (!matchOver && setIndex < sets.Count)
         {
-            sets[setIndex].Player1Games = p1Games;
-            sets[setIndex].Player2Games = p2Games;
+            sets[setIndex].UserGames = p1Games;
+            sets[setIndex].OpponentGames = p2Games;
         }
 
-        result.Player1SetsWon = p1Sets;
-        result.Player2SetsWon = p2Sets;
+        result.UserSetsWon = p1Sets;
+        result.OpponentSetsWon = p2Sets;
         result.SetScores = sets;
         result.InTiebreak = inTiebreak || inMaxiTiebreak;
+        result.MatchOver = matchOver;
         result.CurrentGameScore = inTiebreak || inMaxiTiebreak
             ? $"{p1Tiebreak} - {p2Tiebreak}"
             : FormatGameScore(p1Points, p2Points, false, noAd || decisivePoint);
@@ -140,7 +132,7 @@ public class ScorekeepingService : IScorekeepingService
         return result;
     }
 
-    private string FormatGameScore(int p1, int p2, bool tiebreak, bool suddenDeath)
+    private static string FormatGameScore(int p1, int p2, bool tiebreak, bool suddenDeath)
     {
         if (tiebreak) return $"{p1} - {p2}";
         string[] scores = { "0", "15", "30", "40", "Ad" };

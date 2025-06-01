@@ -2,5 +2,5 @@
 {
     Task AddPointAsync(PointDto dto);
     Task<List<PointDto>> GetPointsByMatchIdAsync(int matchId);
-    Task DeleteLastPointAsync(int matchId);
+    Task RemoveLastPointAsync(int matchId);
 }
