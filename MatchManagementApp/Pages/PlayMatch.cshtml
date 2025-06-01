@@ -6,7 +6,7 @@
 
 <h2>Play Match</h2>
 
-@if (Model.ViewModel?.DisplaySetIndices != null && Model.ViewModel.DisplaySetIndices.Count > 0)
+@if (Model.ViewModel?.Score != null)
 {
     <div class="scoreboard border p-3 mb-4 rounded bg-light">
         <table class="table table-bordered text-center mb-0">
@@ -28,9 +28,9 @@
                         <td>@games</td>
                     }
                     <td>
-                        @if (Model.ViewModel.InTiebreak && Model.ViewModel.CurrentGameScore.Contains('-'))
+                        @if (Model.ViewModel.Score.InTiebreak && Model.ViewModel.Score.CurrentGameScore.Contains('-'))
                         {
-                            var parts = Model.ViewModel.CurrentGameScore.Split('-');
+                            var parts = Model.ViewModel.Score.CurrentGameScore.Split('-');
                             @parts[0].Trim()
                         }
                         else
@@ -46,9 +46,9 @@
                         <td>@games</td>
                     }
                     <td>
-                        @if (Model.ViewModel.InTiebreak && Model.ViewModel.CurrentGameScore.Contains('-'))
+                        @if (Model.ViewModel.Score.InTiebreak && Model.ViewModel.Score.CurrentGameScore.Contains('-'))
                         {
-                            var parts = Model.ViewModel.CurrentGameScore.Split('-');
+                            var parts = Model.ViewModel.Score.CurrentGameScore.Split('-');
                             @parts[1].Trim()
                         }
                         else

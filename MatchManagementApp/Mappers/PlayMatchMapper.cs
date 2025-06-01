@@ -4,13 +4,12 @@
     {
         return new PlayMatchViewModel
         {
-            MatchId = dto.MatchId,
-            MatchType = dto.MatchType,
-            PartnerName = dto.PartnerName,
-            Opponent1 = dto.Opponent1,
-            Opponent2 = dto.Opponent2,
-            Surface = dto.Surface,
-            Status = dto.Status
+            Score = dto.Score,
+            DisplaySetIndices = dto.DisplaySetIndices,
+            UserSetGames = dto.UserSetGames,
+            OpponentSetGames = dto.OpponentSetGames,
+            GameUserDisplay = dto.GameUserDisplay,
+            GameOpponentDisplay = dto.GameOpponentDisplay
         };
     }
 }
