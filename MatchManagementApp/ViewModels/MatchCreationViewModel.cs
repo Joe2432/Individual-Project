@@ -24,4 +24,7 @@ public class MatchCreationViewModel
 
     [Required]
     public string Surface { get; set; } = "Hard";
+
+    [Required]
+    public string InitialServer { get; set; } = "User";
 }

@@ -13,6 +13,7 @@ public class MatchEntityConfiguration : IEntityTypeConfiguration<MatchEntity>
         builder.Property(m => m.FinalSetType).IsRequired();
         builder.Property(m => m.GameFormat).IsRequired();
         builder.Property(m => m.Surface).IsRequired();
+        builder.Property(m => m.InitialServer).IsRequired();
 
         builder.Property(m => m.MatchDate)
             .IsRequired()

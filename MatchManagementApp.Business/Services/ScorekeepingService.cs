@@ -130,9 +130,38 @@
             ? $"{p1Tiebreak} - {p2Tiebreak}"
             : FormatGameScore(p1Points, p2Points, false, noAd || decisivePoint);
 
-        match.ScoreSummary = BuildScoreSummary(sets);
+        match.ScoreSummary = FormatSetScores(sets);
 
         return match;
+    }
+
+    private string FormatSetScores(List<SetScoreDto> sets)
+    {
+        var formattedSets = new List<string>();
+
+        foreach (var set in sets)
+        {
+            if (set.Player1Games == 0 && set.Player2Games == 0)
+                continue;
+
+            string setScore;
+            if (set.TiebreakScore.HasValue)
+            {
+                bool p1WonSet = set.Player1Games > set.Player2Games;
+                if (p1WonSet)
+                    setScore = $"{set.Player1Games}-{set.Player2Games}({set.TiebreakScore})";
+                else
+                    setScore = $"{set.Player1Games}({set.TiebreakScore})-{set.Player2Games}";
+            }
+            else
+            {
+                setScore = $"{set.Player1Games}-{set.Player2Games}";
+            }
+
+            formattedSets.Add(setScore);
+        }
+
+        return string.Join(" ", formattedSets);
     }
 
     private string FormatGameScore(int p1, int p2, bool tiebreak, bool suddenDeath)
@@ -150,25 +179,5 @@
         string s1 = p1 >= scores.Length ? "Game" : scores[p1];
         string s2 = p2 >= scores.Length ? "Game" : scores[p2];
         return $"{s1} - {s2}";
-    }
-
-    private string BuildScoreSummary(List<SetScoreDto> sets)
-    {
-        var parts = new List<string>();
-
-        foreach (var set in sets)
-        {
-            if (set.Player1Games == 0 && set.Player2Games == 0) continue;
-
-            var score = $"{set.Player1Games}-{set.Player2Games}";
-            if (set.TiebreakScore.HasValue)
-            {
-                score += $"({set.TiebreakScore})";
-            }
-
-            parts.Add(score);
-        }
-
-        return parts.Count > 0 ? string.Join(", ", parts) : "-";
     }
 }

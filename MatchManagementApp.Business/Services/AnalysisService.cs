@@ -33,7 +33,8 @@
             FinalSetType = matchEntity.FinalSetType,
             GameFormat = matchEntity.GameFormat,
             Surface = matchEntity.Surface,
-            MatchDate = matchEntity.MatchDate
+            MatchDate = matchEntity.MatchDate,
+            InitialServer = matchEntity.InitialServer
         };
 
         var pointDtos = await _pointRepository.GetPointsByMatchIdAsync(matchId);

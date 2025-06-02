@@ -6,14 +6,16 @@
         {
             PointType = entity.WinningMethod,
             NumberOfShots = entity.NrShots,
-            IsUserWinner = entity.WinnerLabel == "User"
+            IsUserWinner = entity.WinnerLabel == "User",
+            IsFirstServe = entity.IsFirstServe
         };
     }
+
 
     public static PointEntity ToEntity(this PointDto dto)
     {
         var winnerLabel = dto.IsUserWinner ? "User" : "Opponent";
-        return new PointEntity(dto.MatchId, winnerLabel, dto.PointType, dto.NumberOfShots);
+        return new PointEntity(dto.MatchId, winnerLabel, dto.PointType, dto.NumberOfShots, dto.IsFirstServe);
     }
 
 }

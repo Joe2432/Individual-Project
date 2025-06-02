@@ -23,4 +23,5 @@ public class PointService : IPointService
     {
         return await _pointRepository.GetPointsByMatchIdAsync(matchId);
     }
+
 }

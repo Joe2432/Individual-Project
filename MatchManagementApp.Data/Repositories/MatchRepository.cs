@@ -43,4 +43,14 @@ public class MatchRepository : IMatchRepository
             await _context.SaveChangesAsync();
         }
     }
+    public async Task UpdateInitialServerAsync(int matchId, string initialServer)
+    {
+        var match = await _context.Matches.FindAsync(matchId);
+        if (match != null)
+        {
+            match.InitialServer = initialServer;
+            await _context.SaveChangesAsync();
+        }
+    }
+
 }

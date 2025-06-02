@@ -1,0 +1,19 @@
+﻿@page "{id:int}"
+@model MatchManagementApp.UI.Pages.CoinTossModel
+@{
+    ViewData["Title"] = "Coin Toss";
+}
+
+<h2 class="text-center">Who Will Serve First?</h2>
+
+<div class="d-flex justify-content-center my-5">
+    <form method="post" asp-page-handler="SelectServer" class="me-3">
+        <input type="hidden" name="server" value="User" />
+        <button type="submit" class="btn btn-primary btn-lg">You Serve</button>
+    </form>
+
+    <form method="post" asp-page-handler="SelectServer">
+        <input type="hidden" name="server" value="Opponent" />
+        <button type="submit" class="btn btn-danger btn-lg">Opponent Serves</button>
+    </form>
+</div>

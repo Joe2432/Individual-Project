@@ -1,7 +1,9 @@
 ﻿public static class PlayMatchMapper
 {
-    public static PlayMatchViewModel ToViewModel(MatchDto dto)
+    public static PlayMatchViewModel ToViewModel(MatchDto dto, List<PointDto> points, IServeStateService serveStateService)
     {
+        var serveState = serveStateService.GetServeState(dto, points);
+
         return new PlayMatchViewModel
         {
             DisplaySetIndices = Enumerable.Range(0, dto.SetScores.Count).ToList(),
@@ -14,7 +16,9 @@
             {
                 InTiebreak = dto.InTiebreak,
                 CurrentGameScore = dto.CurrentGameScore
-            }
+            },
+            CurrentServer = serveState.CurrentServer,
+            IsFirstServe = serveState.IsFirstServe
         };
     }
 }

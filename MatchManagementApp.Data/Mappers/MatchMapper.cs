@@ -10,6 +10,7 @@
             dto.FinalSetType,
             dto.GameFormat,
             dto.Surface,
+            dto.InitialServer,
             dto.PartnerName,
             dto.SecondOpponentName
         );
@@ -31,7 +32,8 @@
             FinalSetType = entity.FinalSetType,
             GameFormat = entity.GameFormat,
             Surface = entity.Surface,
-            MatchDate = entity.MatchDate
+            MatchDate = entity.MatchDate,
+            InitialServer = entity.InitialServer
         };
     }
 }

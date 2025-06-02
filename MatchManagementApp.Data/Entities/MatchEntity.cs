@@ -13,6 +13,8 @@
     public string Surface { get; private set; }
     public DateTime MatchDate { get; private set; } = DateTime.UtcNow;
 
+    public string InitialServer { get; set; }
+
     public UserEntity User { get; private set; } = null!;
     public ICollection<PointEntity> Points { get; private set; } = new List<PointEntity>();
 
@@ -20,6 +22,7 @@
 
     public MatchEntity(int createdByUserId, string matchType, string firstOpponentName,
     int nrSets, string finalSetType, string gameFormat, string surface,
+    string initialServer,
     string? partnerName = null, string? secondOpponentName = null)
     {
         CreatedByUserId = createdByUserId;
@@ -29,10 +32,14 @@
         FinalSetType = finalSetType;
         GameFormat = gameFormat;
         Surface = surface;
+        InitialServer = initialServer;
         PartnerName = partnerName;
         SecondOpponentName = secondOpponentName;
         MatchDate = DateTime.UtcNow;
     }
-
+    public void SetInitialServer(string server)
+    {
+        InitialServer = server;
+    }
 
 }

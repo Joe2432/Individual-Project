@@ -7,4 +7,6 @@
     public string? GameOpponentDisplay { get; set; }
     public bool MatchOver { get; set; }
     public ScoreViewModel Score { get; set; } = new();
+    public string CurrentServer { get; set; } = "User";
+    public bool IsFirstServe { get; set; } = true;
 }

@@ -12,6 +12,8 @@
     public string FinalSetType { get; set; } = string.Empty;
     public string GameFormat { get; set; } = string.Empty;
 
+    public string InitialServer { get; set; } = string.Empty;
+
     public List<SetScoreDto> SetScores { get; set; } = new();
     public string CurrentGameScore { get; set; } = string.Empty;
     public bool InTiebreak { get; set; }

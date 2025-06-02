@@ -23,5 +23,7 @@ public class PointEntityConfiguration : IEntityTypeConfiguration<PointEntity>
         .HasForeignKey(p => p.MatchId)
         .OnDelete(DeleteBehavior.Cascade);
 
+        builder.Property(p => p.IsFirstServe)
+       .IsRequired();
     }
 }

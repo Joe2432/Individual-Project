@@ -34,6 +34,8 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IMatchService, MatchService>();
 builder.Services.AddScoped<IScorekeepingService, ScorekeepingService>();
 builder.Services.AddScoped<IAnalysisService, AnalysisService>();
+builder.Services.AddScoped<IServeStateService, ServeStateService>();
+builder.Services.AddScoped<IPointService, PointService>();
 
 
 // Dependency Injection — Data layer

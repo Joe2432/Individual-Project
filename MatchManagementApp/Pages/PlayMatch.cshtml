@@ -1,89 +1,109 @@
-﻿@page
+﻿@page "{id:int}"
 @model MatchManagementApp.UI.Pages.PlayMatchModel
 @{
     ViewData["Title"] = "Play Match";
 }
 
-<h2>Play Match</h2>
+<h2 class="text-center mt-3 mb-4">Live Match Scoring</h2>
 
-@if (Model.ViewModel?.Score != null)
+@if (Model.MatchViewModel?.Score != null)
 {
-    <div class="scoreboard border p-3 mb-4 rounded bg-light">
-        <table class="table table-bordered text-center mb-0">
-            <thead class="table-secondary">
+    <div class="scoreboard mb-4">
+        <table class="table table-bordered text-center">
+            <thead>
                 <tr>
                     <th></th>
-                    @foreach (var idx in Model.ViewModel.DisplaySetIndices)
+                    @foreach (var idx in Model.MatchViewModel.DisplaySetIndices)
                     {
                         <th>Set @(idx + 1)</th>
                     }
-                    <th>In Game</th>
+                    <th>Current Game</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td><strong>You</strong></td>
-                    @foreach (var games in Model.ViewModel.UserSetGames)
-                    {
-                        <td>@games</td>
-                    }
                     <td>
-                        @if (Model.ViewModel.Score.InTiebreak && Model.ViewModel.Score.CurrentGameScore.Contains('-'))
+                        <strong>You</strong>
+                        @if (Model.MatchViewModel.CurrentServer == "User")
                         {
-                            var parts = Model.ViewModel.Score.CurrentGameScore.Split('-');
-                            @parts[0].Trim()
-                        }
-                        else
-                        {
-                            @Model.ViewModel.GameUserDisplay
+                            <span class="badge bg-primary ms-2">Server</span>
                         }
                     </td>
+                    @foreach (var g in Model.MatchViewModel.UserSetGames)
+                    {
+                        <td>@g</td>
+                    }
+                    <td>@Model.MatchViewModel.GameUserDisplay</td>
                 </tr>
                 <tr>
-                    <td><strong>Opponent</strong></td>
-                    @foreach (var games in Model.ViewModel.OpponentSetGames)
-                    {
-                        <td>@games</td>
-                    }
                     <td>
-                        @if (Model.ViewModel.Score.InTiebreak && Model.ViewModel.Score.CurrentGameScore.Contains('-'))
+                        <strong>Opponent</strong>
+                        @if (Model.MatchViewModel.CurrentServer == "Opponent")
                         {
-                            var parts = Model.ViewModel.Score.CurrentGameScore.Split('-');
-                            @parts[1].Trim()
-                        }
-                        else
-                        {
-                            @Model.ViewModel.GameOpponentDisplay
+                            <span class="badge bg-primary ms-2">Server</span>
                         }
                     </td>
+                    @foreach (var g in Model.MatchViewModel.OpponentSetGames)
+                    {
+                        <td>@g</td>
+                    }
+                    <td>@Model.MatchViewModel.GameOpponentDisplay</td>
                 </tr>
             </tbody>
         </table>
     </div>
 }
 
-<div class="row">
-    <div class="col-md-6 text-center">
-        <h4>You Won The Point</h4>
-        <form method="post">
-            <input type="hidden" name="isUserWinner" value="true" />
-            <button type="submit" name="pointType" value="Ace" class="btn btn-success m-2">Ace</button>
-            <button type="submit" name="pointType" value="Winner" class="btn btn-success m-2">Winner</button>
-            <button type="submit" name="pointType" value="Unforced Error" class="btn btn-success m-2">Unforced Error</button>
-            <button type="submit" name="pointType" value="Forced Error" class="btn btn-success m-2">Forced Error</button>
-            <button type="submit" name="pointType" value="Double Fault" class="btn btn-success m-2">Double Fault</button>
-        </form>
+@if (Model.MatchViewModel?.MatchOver == true)
+{
+    <div class="alert alert-success text-center mt-4">
+        <h4>Match Over!</h4>
+        <a href="/MatchHistory" class="btn btn-primary mt-3">View Match History</a>
+    </div>
+}
+else if (Model.MatchViewModel != null)
+{
+    <div class="current-game-status text-center mb-3">
+        <span class="badge bg-info text-dark">
+            @if (Model.MatchViewModel.Score.InTiebreak)
+            {
+                <text>Tiebreak</text>
+            }
+            else
+            {
+                <text>@(Model.MatchViewModel.IsFirstServe ? "First Serve" : "Second Serve")</text>
+            }
+        </span>
     </div>
 
-    <div class="col-md-6 text-center">
-        <h4>Opponent Won The Point</h4>
-        <form method="post">
-            <input type="hidden" name="isUserWinner" value="false" />
-            <button type="submit" name="pointType" value="Ace" class="btn btn-danger m-2">Ace</button>
-            <button type="submit" name="pointType" value="Winner" class="btn btn-danger m-2">Winner</button>
-            <button type="submit" name="pointType" value="Unforced Error" class="btn btn-danger m-2">Unforced Error</button>
-            <button type="submit" name="pointType" value="Forced Error" class="btn btn-danger m-2">Forced Error</button>
-            <button type="submit" name="pointType" value="Double Fault" class="btn btn-danger m-2">Double Fault</button>
-        </form>
+    <div class="row mb-4">
+        <div class="col text-center">
+            <h5>@(Model.MatchViewModel.CurrentServer == "User" ? "You (Server)" : "You (Receiver)")</h5>
+            <form method="post">
+                <input type="hidden" asp-for="Point.MatchId" />
+                <input type="hidden" name="Point.IsUserWinner" value="@(Model.MatchViewModel.CurrentServer == "User" ? "true" : "false")" />
+                <input type="hidden" name="Point.IsFirstServe" value="@Model.MatchViewModel.IsFirstServe.ToString().ToLower()" />
+                <input type="hidden" asp-for="Point.NumberOfShots" />
+                <button type="submit" name="Point.PointType" value="Ace" class="btn btn-success m-1" @(Model.MatchViewModel.CurrentServer == "User" && Model.MatchViewModel.IsFirstServe ? "" : "disabled")>Ace</button>
+                <button type="submit" name="Point.PointType" value="Winner" class="btn btn-primary m-1">Winner</button>
+                <button type="submit" name="Point.PointType" value="Fault" class="btn btn-warning m-1" @(Model.MatchViewModel.CurrentServer == "User" ? "" : "disabled")>Fault</button>
+                <button type="submit" name="Point.PointType" value="Unforced Error" class="btn btn-secondary m-1">Unforced Error</button>
+                <button type="submit" name="Point.PointType" value="Forced Error" class="btn btn-secondary m-1">Forced Error</button>
+            </form>
+        </div>
+        <div class="col text-center">
+            <h5>@(Model.MatchViewModel.CurrentServer == "Opponent" ? "Opponent (Server)" : "Opponent (Receiver)")</h5>
+            <form method="post">
+                <input type="hidden" asp-for="Point.MatchId" />
+                <input type="hidden" name="Point.IsUserWinner" value="@(Model.MatchViewModel.CurrentServer == "Opponent" ? "true" : "false")" />
+                <input type="hidden" name="Point.IsFirstServe" value="@Model.MatchViewModel.IsFirstServe.ToString().ToLower()" />
+                <input type="hidden" asp-for="Point.NumberOfShots" />
+                <button type="submit" name="Point.PointType" value="Ace" class="btn btn-danger m-1" @(Model.MatchViewModel.CurrentServer == "Opponent" && Model.MatchViewModel.IsFirstServe ? "" : "disabled")>Ace</button>
+                <button type="submit" name="Point.PointType" value="Winner" class="btn btn-danger m-1">Winner</button>
+                <button type="submit" name="Point.PointType" value="Fault" class="btn btn-warning m-1" @(Model.MatchViewModel.CurrentServer == "Opponent" ? "" : "disabled")>Fault</button>
+                <button type="submit" name="Point.PointType" value="Unforced Error" class="btn btn-danger m-1">Unforced Error</button>
+                <button type="submit" name="Point.PointType" value="Forced Error" class="btn btn-danger m-1">Forced Error</button>
+            </form>
+        </div>
     </div>
-</div>
+}

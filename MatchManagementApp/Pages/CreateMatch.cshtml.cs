@@ -32,7 +32,7 @@ namespace MatchManagementApp.UI.Pages
             var dto = MatchMapper.ToCreateDto(Match, userId.Value);
             var matchId = await _matchService.CreateMatchAsync(dto);
 
-            return RedirectToPage("/PlayMatch", new { id = matchId });
+            return RedirectToPage("/CoinToss", new { id = matchId });
         }
     }
 }

@@ -46,9 +46,19 @@
         {
             var points = await _pointRepository.GetPointsByMatchIdAsync(match.Id);
             var updated = _scorekeepingService.CalculateScore(match, points);
+
             match.SetScores = updated.SetScores;
             match.ScoreSummary = updated.ScoreSummary;
             match.MatchOver = updated.MatchOver;
+            match.CurrentGameScore = updated.CurrentGameScore;
+            match.InTiebreak = updated.InTiebreak;
+            match.DisplaySetIndices = updated.DisplaySetIndices;
+            match.UserSetGames = updated.UserSetGames;
+            match.OpponentSetGames = updated.OpponentSetGames;
+
+            var parts = updated.CurrentGameScore.Split('-');
+            match.GameUserDisplay = parts.Length == 2 ? parts[0].Trim() : updated.CurrentGameScore;
+            match.GameOpponentDisplay = parts.Length == 2 ? parts[1].Trim() : updated.CurrentGameScore;
         }
 
         return matches;
@@ -95,9 +105,22 @@
             return null;
 
         var points = await _pointRepository.GetPointsByMatchIdAsync(matchId);
-        var scored = _scorekeepingService.CalculateScore(match, points);
+        var updated = _scorekeepingService.CalculateScore(match, points);
 
-        return scored;
+        match.SetScores = updated.SetScores;
+        match.ScoreSummary = updated.ScoreSummary;
+        match.MatchOver = updated.MatchOver;
+        match.CurrentGameScore = updated.CurrentGameScore;
+        match.InTiebreak = updated.InTiebreak;
+        match.DisplaySetIndices = updated.DisplaySetIndices;
+        match.UserSetGames = updated.UserSetGames;
+        match.OpponentSetGames = updated.UserSetGames;
+
+        var parts = updated.CurrentGameScore.Split('-');
+        match.GameUserDisplay = parts.Length == 2 ? parts[0].Trim() : updated.CurrentGameScore;
+        match.GameOpponentDisplay = parts.Length == 2 ? parts[1].Trim() : updated.CurrentGameScore;
+
+        return match;
     }
 
     public async Task<List<MatchDto>> GetMatchHistorySummariesAsync(
@@ -141,11 +164,26 @@
         {
             var points = await _pointRepository.GetPointsByMatchIdAsync(match.Id);
             var updated = _scorekeepingService.CalculateScore(match, points);
+
             match.SetScores = updated.SetScores;
             match.ScoreSummary = updated.ScoreSummary;
             match.MatchOver = updated.MatchOver;
+            match.CurrentGameScore = updated.CurrentGameScore;
+            match.InTiebreak = updated.InTiebreak;
+            match.DisplaySetIndices = updated.DisplaySetIndices;
+            match.UserSetGames = updated.UserSetGames;
+            match.OpponentSetGames = updated.UserSetGames;
+
+            var parts = updated.CurrentGameScore.Split('-');
+            match.GameUserDisplay = parts.Length == 2 ? parts[0].Trim() : updated.CurrentGameScore;
+            match.GameOpponentDisplay = parts.Length == 2 ? parts[1].Trim() : updated.CurrentGameScore;
         }
 
         return matches;
     }
+    public async Task UpdateInitialServerAsync(int matchId, string initialServer)
+    {
+        await _matchRepository.UpdateInitialServerAsync(matchId, initialServer);
+    }
+
 }

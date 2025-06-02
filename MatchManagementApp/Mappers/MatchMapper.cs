@@ -12,8 +12,8 @@
             Surface = viewModel.Surface,
             NrSets = viewModel.NrSets,
             FinalSetType = viewModel.FinalSetType,
-            GameFormat = viewModel.GameFormat
+            GameFormat = viewModel.GameFormat,
+            InitialServer = viewModel.InitialServer
         };
     }
-
 }
