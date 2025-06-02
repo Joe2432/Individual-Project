@@ -4,79 +4,109 @@
     ViewData["Title"] = "Match History";
 }
 
-<h2>Match History</h2>
+<h2 class="mb-4 text-center">Match History</h2>
 
 <form method="get" class="mb-4">
-    <div class="form-row row g-2">
-        <div class="col">
-            <input type="text" name="SearchName" class="form-control" value="@Model.SearchName" placeholder="Search by name" />
+    <div class="row gy-2 gx-3 align-items-end">
+        <div class="col-md-4">
+            <label for="SearchName" class="form-label">Search by name</label>
+            <input type="text" name="SearchName" class="form-control" value="@Model.SearchName" placeholder="Opponent or partner name" />
         </div>
-        <div class="col">
-            <input type="text" name="SearchType" class="form-control" value="@Model.SearchType" placeholder="Search by type" />
+        <div class="col-md-2">
+            <label for="SearchType" class="form-label">Match Type</label>
+            <select name="SearchType" class="form-select">
+                <option value="">All Types</option>
+                @foreach (var type in Model.AvailableTypes)
+                {
+                    <option value="@type" selected="@(type == Model.SearchType)">@type</option>
+                }
+            </select>
         </div>
-        <div class="col">
-            <input type="text" name="SearchSurface" class="form-control" value="@Model.SearchSurface" placeholder="Search by surface" />
+        <div class="col-md-2">
+            <label for="SearchSurface" class="form-label">Surface</label>
+            <select name="SearchSurface" class="form-select">
+                <option value="">All Surfaces</option>
+                @foreach (var surface in Model.AvailableSurfaces)
+                {
+                    <option value="@surface" selected="@(surface == Model.SearchSurface)">@surface</option>
+                }
+            </select>
         </div>
-        <div class="col">
-            <input type="date" name="SearchDate" class="form-control" value="@Model.SearchDate?.ToString("yyyy-MM-dd")" />
+        <div class="col-md-2">
+            <label class="form-label">Exact Date</label>
+            <input type="date" name="SearchDate" class="form-control" value="@(Model.SearchDate?.ToString("yyyy-MM-dd"))" />
         </div>
-        <div class="col">
-            <input type="date" name="DateFrom" class="form-control" value="@Model.DateFrom?.ToString("yyyy-MM-dd")" />
+        <div class="col-md-2">
+            <label class="form-label">From</label>
+            <input type="date" name="DateFrom" class="form-control" value="@(Model.DateFrom?.ToString("yyyy-MM-dd"))" />
         </div>
-        <div class="col">
-            <input type="date" name="DateTo" class="form-control" value="@Model.DateTo?.ToString("yyyy-MM-dd")" />
+        <div class="col-md-2">
+            <label class="form-label">To</label>
+            <input type="date" name="DateTo" class="form-control" value="@(Model.DateTo?.ToString("yyyy-MM-dd"))" />
         </div>
-        <div class="col-auto">
-            <button type="submit" class="btn btn-primary">Search</button>
+        <div class="col-md-2 d-grid">
+            <button type="submit" class="btn btn-primary mt-2">Search</button>
         </div>
     </div>
 </form>
 
-@if (Model.MatchSummaries.Any())
-{
-    <table class="table table-bordered table-striped">
-        <thead class="thead-dark">
+<div class="table-responsive">
+    <table class="table table-bordered table-hover text-center align-middle">
+        <thead class="table-light">
             <tr>
-                <th>Match Type</th>
+                <th>Type</th>
                 <th>Partner</th>
                 <th>Opponent 1</th>
                 <th>Opponent 2</th>
                 <th>Surface</th>
                 <th>Score</th>
-                <th>Status</th>
                 <th>Date</th>
+                <th>Status</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var m in Model.MatchSummaries)
+            @foreach (var match in Model.MatchSummaries)
             {
                 <tr>
-                    <td>@m.MatchType</td>
-                    <td>@m.PartnerName</td>
-                    <td>@m.FirstOpponentName</td>
-                    <td>@m.SecondOpponentName</td>
-                    <td>@m.Surface</td>
-                    <td>@m.ScoreSummary</td>
-                    <td>@m.Status</td>
-                    <td>@(m.MatchDate?.ToString("dd MMM yyyy") ?? "-")</td>
+                    <td>@match.MatchType</td>
+                    <td>@match.PartnerName</td>
+                    <td>@match.FirstOpponentName</td>
+                    <td>@match.SecondOpponentName</td>
+                    <td>@match.Surface</td>
+                    <td>@(string.IsNullOrEmpty(match.ScoreSummary) ? "-" : match.ScoreSummary)</td>
+                    <td>@(match.MatchDate?.ToString("yyyy-MM-dd") ?? "-")</td>
+                    <td>@(match.MatchOver ? "Finished" : "In Progress")</td>
                     <td>
-                        <a asp-page="/MatchDetails" asp-route-id="@m.MatchId" class="btn btn-outline-secondary btn-sm">Details</a>
-                        @if (!m.MatchOver)
+                        @if (!match.MatchOver)
                         {
-                            <a asp-page="/PlayMatch" asp-route-id="@m.MatchId" class="btn btn-primary btn-sm ml-1">Continue</a>
+                            <a asp-page="/PlayMatch" asp-route-id="@match.MatchId" class="btn btn-sm btn-primary mb-1">Continue</a>
                         }
-                        else
-                        {
-                            <span class="text-muted">-</span>
-                        }
+                        <a asp-page="/Analysis" asp-route-id="@match.MatchId" class="btn btn-sm btn-outline-secondary">Details</a>
                     </td>
                 </tr>
             }
         </tbody>
     </table>
-}
-else
-{
-    <p>No matches found.</p>
-}
+</div>
+<style>
+        table
+
+    {
+        font-size: 0.9rem;
+    }
+
+    th, td {
+        padding: 0.5rem;
+    }
+
+    .form-label {
+        font-size: 0.85rem;
+    }
+
+    }
+
+    th, td {
+        vertical-align: middle !important;
+    }
+</style>

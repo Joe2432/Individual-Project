@@ -1,0 +1,129 @@
+﻿@page "{id:int}"
+@model MatchManagementApp.UI.Pages.AnalysisModel
+@{
+    ViewData["Title"] = "Match Analysis";
+    var vm = Model.ViewModel;
+}
+
+<h1 class="mt-3">Match Analysis</h1>
+
+@if (vm == null)
+{
+    <div class="alert alert-warning">
+        No data to display or access denied.
+    </div>
+}
+else
+{
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">@vm.PlayerAName vs. @vm.PlayerBName</h5>
+            <p class="card-text">
+                <strong>Match ID:</strong> @vm.MatchId
+                &nbsp;|&nbsp;
+                <strong>Date:</strong> @(vm.MatchDate?.ToString("yyyy-MM-dd HH:mm") ?? "N/A")
+            </p>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header bg-secondary text-white">
+            Set-by-Set Score
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-sm table-striped mb-0 text-center">
+                <thead>
+                    <tr>
+                        <th></th>
+                        @for (int i = 0; i < vm.PlayerAGameByGame.Count; i++)
+                        {
+                            <th>Set @(i + 1)</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th>@vm.PlayerAName</th>
+                        @foreach (var setScore in vm.PlayerAGameByGame)
+                        {
+                            <td>@(setScore.Split('-')[0])</td>
+                        }
+                    </tr>
+                    <tr>
+                        <th>@vm.PlayerBName</th>
+                        @foreach (var setScore in vm.PlayerBGameByGame)
+                        {
+                            <td>@(setScore.Split('-')[1].Split('(')[0])</td>
+                        }
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header bg-secondary text-white">
+            Point Statistics
+        </div>
+        <div class="card-body p-0">
+            <div class="d-none d-md-grid"
+                 style="grid-template-columns: 1fr 2fr 1fr; row-gap: 1rem; column-gap: 1rem; padding: 1rem;">
+                <div class="text-end fw-bold">@vm.PlayerAName</div>
+                <div class="text-center fw-bold">Statistic</div>
+                <div class="text-start fw-bold">@vm.PlayerBName</div>
+
+                <div class="text-end">@vm.AcesPlayerA</div>
+                <div class="text-center">Aces</div>
+                <div class="text-start">@vm.AcesPlayerB</div>
+
+                <div class="text-end">@vm.DoubleFaultsPlayerA</div>
+                <div class="text-center">Double Faults</div>
+                <div class="text-start">@vm.DoubleFaultsPlayerB</div>
+
+                <div class="text-end">@vm.WinnersPlayerA</div>
+                <div class="text-center">Winners</div>
+                <div class="text-start">@vm.WinnersPlayerB</div>
+
+                <div class="text-end">@vm.UnforcedErrorsPlayerA</div>
+                <div class="text-center">Unforced Errors</div>
+                <div class="text-start">@vm.UnforcedErrorsPlayerB</div>
+
+                <div class="text-end">@vm.ForcedErrorsPlayerA</div>
+                <div class="text-center">Forced Errors</div>
+                <div class="text-start">@vm.ForcedErrorsPlayerB</div>
+
+                <div class="text-end">@vm.TotalPointsPlayerA</div>
+                <div class="text-center">Points Won</div>
+                <div class="text-start">@vm.TotalPointsPlayerB</div>
+
+                <div class="text-end">@vm.TotalGamesPlayerA</div>
+                <div class="text-center">Games Won</div>
+                <div class="text-start">@vm.TotalGamesPlayerB</div>
+            </div>
+
+            <div class="d-block d-md-none p-3">
+                <div class="mb-2">
+                    <strong>Aces:</strong> @vm.PlayerAName (@vm.AcesPlayerA) – (@vm.AcesPlayerB) @vm.PlayerBName
+                </div>
+                <div class="mb-2">
+                    <strong>Double Faults:</strong> @vm.PlayerAName (@vm.DoubleFaultsPlayerA) – (@vm.DoubleFaultsPlayerB) @vm.PlayerBName
+                </div>
+                <div class="mb-2">
+                    <strong>Winners:</strong> @vm.PlayerAName (@vm.WinnersPlayerA) – (@vm.WinnersPlayerB) @vm.PlayerBName
+                </div>
+                <div class="mb-2">
+                    <strong>Unforced Errors:</strong> @vm.PlayerAName (@vm.UnforcedErrorsPlayerA) – (@vm.UnforcedErrorsPlayerB) @vm.PlayerBName
+                </div>
+                <div class="mb-2">
+                    <strong>Forced Errors:</strong> @vm.PlayerAName (@vm.ForcedErrorsPlayerA) – (@vm.ForcedErrorsPlayerB) @vm.PlayerBName
+                </div>
+                <div class="mb-2">
+                    <strong>Points Won:</strong> @vm.PlayerAName (@vm.TotalPointsPlayerA) – (@vm.TotalPointsPlayerB) @vm.PlayerBName
+                </div>
+                <div class="mb-2">
+                    <strong>Games Won:</strong> @vm.PlayerAName (@vm.TotalGamesPlayerA) – (@vm.TotalGamesPlayerB) @vm.PlayerBName
+                </div>
+            </div>
+        </div>
+    </div>
+}

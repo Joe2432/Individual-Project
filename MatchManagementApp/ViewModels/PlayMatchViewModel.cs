@@ -1,9 +1,10 @@
 ﻿public class PlayMatchViewModel
 {
-    public MatchScoreDto Score { get; set; }
-    public List<int> DisplaySetIndices { get; set; }
-    public List<string> UserSetGames { get; set; }
-    public List<string> OpponentSetGames { get; set; }
-    public string GameUserDisplay { get; set; }
-    public string GameOpponentDisplay { get; set; }
+    public List<int> DisplaySetIndices { get; set; } = new();
+    public List<int> UserSetGames { get; set; } = new();
+    public List<int> OpponentSetGames { get; set; } = new();
+    public string? GameUserDisplay { get; set; }
+    public string? GameOpponentDisplay { get; set; }
+    public bool MatchOver { get; set; }
+    public ScoreViewModel Score { get; set; } = new();
 }

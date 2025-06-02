@@ -60,6 +60,10 @@ public class MatchServiceTests
         };
 
         _matchRepositoryMock.Setup(r => r.GetMatchesByUserIdAsync(userId)).ReturnsAsync(matchList);
+        _scorekeepingServiceMock.Setup(s => s.CalculateScore(It.IsAny<MatchDto>(), It.IsAny<IEnumerable<PointDto>>()))
+            .Returns<MatchDto, IEnumerable<PointDto>>((dto, _) => dto);
+
+        _pointRepositoryMock.Setup(r => r.GetPointsByMatchIdAsync(It.IsAny<int>())).ReturnsAsync(new List<PointDto>());
 
         var result = await _matchService.GetUserMatchesAsync(userId);
 
@@ -73,13 +77,15 @@ public class MatchServiceTests
         int matchId = 1, userId = 1;
         var match = MatchDtoFactory.ValidSinglesMatch(userId);
         var points = PointDtoFactory.SimulatedGamePoints(true);
+        match.CurrentGameScore = "40 - 30";
 
         _matchRepositoryMock.Setup(r => r.GetMatchByIdAsync(matchId)).ReturnsAsync(match);
         _pointRepositoryMock.Setup(r => r.GetPointsByMatchIdAsync(matchId)).ReturnsAsync(points);
+        _scorekeepingServiceMock.Setup(s => s.CalculateScore(match, points)).Returns(match);
 
         var result = await _matchService.GetScoreDisplayAsync(matchId, userId);
 
-        Assert.Contains("-", result);
+        Assert.Equal("40 - 30", result);
     }
 
     [Fact]
@@ -134,36 +140,33 @@ public class MatchServiceTests
     }
 
     [Fact]
-    public async Task GetPlayMatchDtoAsync_ShouldReturnDto_WhenMatchExists()
+    public async Task GetMatchForPlayingAsync_ShouldReturnDto_WhenMatchExists()
     {
         int matchId = 1, userId = 1;
         var match = MatchDtoFactory.ValidSinglesMatch(userId);
         var points = PointDtoFactory.SimulatedGamePoints(true);
-        var score = new MatchScoreDto
-        {
-            SetScores = new List<SetScoreDto> { new() { Player1Games = 1, Player2Games = 0 } },
-            CurrentGameScore = "15 - 0"
-        };
+        match.SetScores = new List<SetScoreDto> { new() { Player1Games = 1, Player2Games = 0 } };
+        match.CurrentGameScore = "15 - 0";
 
         _matchRepositoryMock.Setup(r => r.GetMatchByIdAsync(matchId)).ReturnsAsync(match);
         _pointRepositoryMock.Setup(r => r.GetPointsByMatchIdAsync(matchId)).ReturnsAsync(points);
-        _scorekeepingServiceMock.Setup(s => s.CalculateScore(match, points)).Returns(score);
+        _scorekeepingServiceMock.Setup(s => s.CalculateScore(match, points)).Returns(match);
 
-        var result = await _matchService.GetPlayMatchDtoAsync(matchId, userId);
+        var result = await _matchService.GetMatchForPlayingAsync(matchId, userId);
 
         Assert.NotNull(result);
         Assert.Equal("15", result.GameUserDisplay);
         Assert.Equal("0", result.GameOpponentDisplay);
-        Assert.Single(result.Score.SetScores);
+        Assert.Single(result.SetScores);
     }
 
     [Fact]
-    public async Task GetPlayMatchDtoAsync_ShouldReturnNull_WhenMatchNotFound()
+    public async Task GetMatchForPlayingAsync_ShouldReturnNull_WhenMatchNotFound()
     {
         int matchId = 123, userId = 1;
         _matchRepositoryMock.Setup(r => r.GetMatchByIdAsync(matchId)).ReturnsAsync((MatchDto?)null);
 
-        var result = await _matchService.GetPlayMatchDtoAsync(matchId, userId);
+        var result = await _matchService.GetMatchForPlayingAsync(matchId, userId);
 
         Assert.Null(result);
     }

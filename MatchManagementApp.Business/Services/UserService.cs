@@ -1,6 +1,4 @@
-﻿using System;
-using System.Security.Claims;
-using System.Threading.Tasks;
+﻿using System.Security.Claims;
 
 public class UserService : IUserService
 {
@@ -24,7 +22,6 @@ public class UserService : IUserService
 
     public async Task CreateUserAsync(UserDto dto)
     {
-        // HashPassword requires a non-null Password
         if (dto.Password is null)
             throw new ArgumentException("Password must be provided", nameof(dto));
 
@@ -38,7 +35,7 @@ public class UserService : IUserService
     public bool VerifyPassword(string hash, string raw)
         => BCrypt.Net.BCrypt.Verify(raw, hash);
 
-    public Task<int?> GetCurrentUserId(ClaimsPrincipal principal)
+    public Task<int?> GetCurrentUserIdAsync(ClaimsPrincipal principal)
     {
         var idClaim = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         return int.TryParse(idClaim, out var id)

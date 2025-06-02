@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -20,11 +21,11 @@ namespace MatchManagementApp.UI.Pages
 
         public async Task<IActionResult> OnGetAsync(int id)
         {
-            var userId = await _userService.GetCurrentUserId(User);
+            var userId = await _userService.GetCurrentUserIdAsync(User);
             if (userId == null)
                 return RedirectToPage("/Account/Login");
 
-            var dto = await _matchService.GetPlayMatchDtoAsync(id, userId.Value);
+            var dto = await _matchService.GetMatchForPlayingAsync(id, userId.Value);
             if (dto == null)
                 return NotFound();
 
@@ -34,7 +35,7 @@ namespace MatchManagementApp.UI.Pages
 
         public async Task<IActionResult> OnPostAsync(int id, string pointType, bool isUserWinner)
         {
-            var userId = await _userService.GetCurrentUserId(User);
+            var userId = await _userService.GetCurrentUserIdAsync(User);
             if (userId == null)
                 return RedirectToPage("/Account/Login");
 

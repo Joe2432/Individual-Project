@@ -1,19 +1,19 @@
 ﻿public interface IMatchService
 {
-    Task<int> CreateMatchAsync(MatchDto dto);
+    Task<int> CreateMatchAsync(MatchDto matchDto);
+    Task DeleteMatchAsync(int matchId);
+    Task<MatchDto?> GetMatchByIdAsync(int matchId);
     Task<List<MatchDto>> GetUserMatchesAsync(int userId);
     Task<string> GetScoreDisplayAsync(int matchId, int userId);
     Task RegisterPointAsync(int matchId, int userId, string pointType, bool isUserWinner);
     Task UndoLastPointAsync(int matchId);
-    Task<PlayMatchDto?> GetPlayMatchDtoAsync(int matchId, int userId);
-    Task<List<MatchHistoryDto>> GetMatchHistorySummariesAsync(
+    Task<MatchDto?> GetMatchForPlayingAsync(int matchId, int userId);
+    Task<List<MatchDto>> GetMatchHistorySummariesAsync(
         int userId,
-        string? name = null,
-        string? type = null,
-        string? surface = null,
-        DateTime? date = null,
-        DateTime? dateFrom = null,
-        DateTime? dateTo = null
-    );
-
+        string? name,
+        string? type,
+        string? surface,
+        DateTime? date,
+        DateTime? dateFrom,
+        DateTime? dateTo);
 }

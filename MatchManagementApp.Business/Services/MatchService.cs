@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-public class MatchService : IMatchService
+﻿public class MatchService : IMatchService
 {
     private readonly IMatchRepository _matchRepository;
     private readonly IPointRepository _pointRepository;
@@ -14,7 +9,7 @@ public class MatchService : IMatchService
         IMatchRepository matchRepository,
         IPointRepository pointRepository,
         IUserRepository userRepository,
-        IScorekeepingService scorekeepingService) // <-- Make sure to inject this
+        IScorekeepingService scorekeepingService)
     {
         _matchRepository = matchRepository;
         _pointRepository = pointRepository;
@@ -22,149 +17,108 @@ public class MatchService : IMatchService
         _scorekeepingService = scorekeepingService;
     }
 
-    public async Task<int> CreateMatchAsync(MatchDto dto)
+    public async Task<int> CreateMatchAsync(MatchDto matchDto)
     {
-        Console.WriteLine($"[MatchService] Received match creation request for user ID: {dto.CreatedByUserId}");
-
-        var user = await _userRepository.GetUserByIdAsync(dto.CreatedByUserId);
-
+        var user = await _userRepository.GetUserByIdAsync(matchDto.CreatedByUserId);
         if (user == null)
-        {
-            Console.WriteLine($"[MatchService] ERROR: No user found in DB with ID {dto.CreatedByUserId}");
-            throw new InvalidOperationException("Cannot create match: user does not exist.");
-        }
+            throw new InvalidOperationException("User not found");
 
-        Console.WriteLine($"[MatchService] User verified. Proceeding to create match.");
-        return await _matchRepository.CreateMatchAsync(dto);
+        var matchId = await _matchRepository.CreateMatchAsync(matchDto);
+        matchDto.Id = matchId;
+        return matchId;
+    }
+
+    public async Task DeleteMatchAsync(int matchId)
+    {
+        await _matchRepository.DeleteMatchAsync(matchId);
+    }
+
+    public async Task<MatchDto?> GetMatchByIdAsync(int matchId)
+    {
+        return await _matchRepository.GetMatchByIdAsync(matchId);
     }
 
     public async Task<List<MatchDto>> GetUserMatchesAsync(int userId)
     {
-        Console.WriteLine($"[MatchService] Fetching matches for user ID: {userId}");
-        return await _matchRepository.GetMatchesByUserIdAsync(userId);
+        var matches = await _matchRepository.GetMatchesByUserIdAsync(userId);
+
+        foreach (var match in matches)
+        {
+            var points = await _pointRepository.GetPointsByMatchIdAsync(match.Id);
+            var updated = _scorekeepingService.CalculateScore(match, points);
+            match.SetScores = updated.SetScores;
+            match.ScoreSummary = updated.ScoreSummary;
+            match.MatchOver = updated.MatchOver;
+        }
+
+        return matches;
     }
 
     public async Task<string> GetScoreDisplayAsync(int matchId, int userId)
     {
-        Console.WriteLine($"[MatchService] Calculating score for match ID: {matchId}");
-
         var match = await _matchRepository.GetMatchByIdAsync(matchId);
         if (match == null)
-        {
-            Console.WriteLine($"[MatchService] ERROR: Match ID {matchId} not found.");
             return "Match not found";
-        }
 
         var points = await _pointRepository.GetPointsByMatchIdAsync(matchId);
-        var player1Points = points.Count(p => p.IsUserWinner);
-        var player2Points = points.Count(p => !p.IsUserWinner);
+        var scored = _scorekeepingService.CalculateScore(match, points);
 
-        Console.WriteLine($"[MatchService] Current score: {player1Points} - {player2Points}");
-
-        return $"{player1Points} - {player2Points}";
+        return scored.CurrentGameScore ?? "0 - 0";
     }
 
     public async Task RegisterPointAsync(int matchId, int userId, string pointType, bool isUserWinner)
     {
-        Console.WriteLine($"[MatchService] Registering point for match ID: {matchId}, won by {(isUserWinner ? "User" : "Opponent")}");
-
         var match = await _matchRepository.GetMatchByIdAsync(matchId);
         if (match == null)
-        {
-            Console.WriteLine($"[MatchService] ERROR: Match ID {matchId} not found. Point not registered.");
             return;
-        }
 
         var point = new PointDto
         {
             MatchId = matchId,
             PointType = pointType,
-            NumberOfShots = 0,
-            IsUserWinner = isUserWinner
+            IsUserWinner = isUserWinner,
+            NumberOfShots = 0
         };
 
         await _pointRepository.AddPointAsync(point);
-        Console.WriteLine("[MatchService] Point successfully registered.");
     }
 
     public async Task UndoLastPointAsync(int matchId)
     {
-        Console.WriteLine($"[MatchService] Undoing last point for match ID: {matchId}");
         await _pointRepository.DeleteLastPointAsync(matchId);
     }
 
-
-    public async Task<PlayMatchDto?> GetPlayMatchDtoAsync(int matchId, int userId)
+    public async Task<MatchDto?> GetMatchForPlayingAsync(int matchId, int userId)
     {
         var match = await _matchRepository.GetMatchByIdAsync(matchId);
         if (match == null)
             return null;
 
         var points = await _pointRepository.GetPointsByMatchIdAsync(matchId);
-        var score = _scorekeepingService.CalculateScore(match, points);
+        var scored = _scorekeepingService.CalculateScore(match, points);
 
-        var displaySetIndices = new List<int>();
-        var userSetGames = new List<string>();
-        var opponentSetGames = new List<string>();
-        string gameUserDisplay = "";
-        string gameOpponentDisplay = "";
-
-        for (int i = 0; i < score.SetScores.Count; i++)
-        {
-            var set = score.SetScores[i];
-            bool isFinalSet = i == score.SetScores.Count - 1;
-            bool isEmptyFinalSet = isFinalSet
-                && set.Player1Games == 0
-                && set.Player2Games == 0
-                && score.MatchOver;
-
-            if (!isEmptyFinalSet)
-            {
-                displaySetIndices.Add(i);
-                userSetGames.Add(set.Player1Games.ToString());
-                opponentSetGames.Add(set.Player2Games.ToString());
-            }
-        }
-
-        var parts = score.CurrentGameScore.Split('-');
-        if (parts.Length == 2)
-        {
-            gameUserDisplay = parts[0].Trim();
-            gameOpponentDisplay = parts[1].Trim();
-        }
-        else
-        {
-            gameUserDisplay = gameOpponentDisplay = score.CurrentGameScore;
-        }
-
-        return new PlayMatchDto
-        {
-            Score = score,
-            DisplaySetIndices = displaySetIndices,
-            UserSetGames = userSetGames,
-            OpponentSetGames = opponentSetGames,
-            GameUserDisplay = gameUserDisplay,
-            GameOpponentDisplay = gameOpponentDisplay
-        };
+        return scored;
     }
 
-    public async Task<List<MatchHistoryDto>> GetMatchHistorySummariesAsync(
+    public async Task<List<MatchDto>> GetMatchHistorySummariesAsync(
         int userId,
-        string? name = null,
-        string? type = null,
-        string? surface = null,
-        DateTime? date = null,
-        DateTime? dateFrom = null,
-        DateTime? dateTo = null)
+        string? name,
+        string? type,
+        string? surface,
+        DateTime? date,
+        DateTime? dateFrom,
+        DateTime? dateTo)
     {
         var matches = await _matchRepository.GetMatchesByUserIdAsync(userId);
 
         if (!string.IsNullOrWhiteSpace(name))
         {
             matches = matches.Where(m =>
-                (!string.IsNullOrWhiteSpace(m.FirstOpponentName) && m.FirstOpponentName.Contains(name, StringComparison.OrdinalIgnoreCase)) ||
-                (!string.IsNullOrWhiteSpace(m.SecondOpponentName) && m.SecondOpponentName.Contains(name, StringComparison.OrdinalIgnoreCase)) ||
-                (!string.IsNullOrWhiteSpace(m.PartnerName) && m.PartnerName.Contains(name, StringComparison.OrdinalIgnoreCase))
+                (m.MatchType == "Singles" && m.FirstOpponentName.Contains(name, StringComparison.OrdinalIgnoreCase)) ||
+                (m.MatchType == "Doubles" &&
+                 (m.FirstOpponentName.Contains(name, StringComparison.OrdinalIgnoreCase) ||
+                  m.SecondOpponentName.Contains(name, StringComparison.OrdinalIgnoreCase) ||
+                  m.PartnerName.Contains(name, StringComparison.OrdinalIgnoreCase)))
             ).ToList();
         }
 
@@ -175,36 +129,23 @@ public class MatchService : IMatchService
             matches = matches.Where(m => m.Surface.Equals(surface, StringComparison.OrdinalIgnoreCase)).ToList();
 
         if (date.HasValue)
-            matches = matches.Where(m => m.MatchDate == date.Value.Date).ToList();
+            matches = matches.Where(m => m.MatchDate?.Date == date.Value.Date).ToList();
 
         if (dateFrom.HasValue)
-            matches = matches.Where(m => m.MatchDate >= dateFrom.Value.Date).ToList();
+            matches = matches.Where(m => m.MatchDate >= dateFrom.Value).ToList();
 
         if (dateTo.HasValue)
-            matches = matches.Where(m => m.MatchDate <= dateTo.Value.Date).ToList();
-
-        var summaries = new List<MatchHistoryDto>();
+            matches = matches.Where(m => m.MatchDate <= dateTo.Value).ToList();
 
         foreach (var match in matches)
         {
             var points = await _pointRepository.GetPointsByMatchIdAsync(match.Id);
-            var score = _scorekeepingService.CalculateScore(match, points);
-
-            var formatted = string.Join(" ", score.SetScores
-                .Where(s => s.Player1Games > 0 || s.Player2Games > 0)
-                .Select(s => s.ToString()));
-
-            summaries.Add(new MatchHistoryDto
-            {
-                Match = match,
-                ScoreSummary = formatted,
-                MatchOver = score.MatchOver,
-                MatchDate = match.MatchDate
-            });
-
+            var updated = _scorekeepingService.CalculateScore(match, points);
+            match.SetScores = updated.SetScores;
+            match.ScoreSummary = updated.ScoreSummary;
+            match.MatchOver = updated.MatchOver;
         }
 
-        return summaries;
+        return matches;
     }
-
 }

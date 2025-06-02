@@ -12,10 +12,8 @@ public class MatchRepository : IMatchRepository
     public async Task<int> CreateMatchAsync(MatchDto dto)
     {
         var entity = dto.ToEntity();
-
         _context.Matches.Add(entity);
         await _context.SaveChangesAsync();
-
         return entity.Id;
     }
 
@@ -36,4 +34,13 @@ public class MatchRepository : IMatchRepository
         return entity?.ToDto();
     }
 
+    public async Task DeleteMatchAsync(int matchId)
+    {
+        var entity = await _context.Matches.FindAsync(matchId);
+        if (entity != null)
+        {
+            _context.Matches.Remove(entity);
+            await _context.SaveChangesAsync();
+        }
+    }
 }

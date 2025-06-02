@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -16,14 +17,15 @@ namespace MatchManagementApp.UI.Pages
             _userService = userService;
         }
 
-        [BindProperty] public MatchCreationViewModel Match { get; set; } = new();
+        [BindProperty]
+        public MatchCreationViewModel Match { get; set; } = new();
 
         public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)
                 return Page();
 
-            var userId = await _userService.GetCurrentUserId(User);
+            var userId = await _userService.GetCurrentUserIdAsync(User);
             if (userId == null)
                 return RedirectToPage("/Account/Login");
 

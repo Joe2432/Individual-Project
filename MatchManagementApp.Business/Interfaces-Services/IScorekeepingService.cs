@@ -2,5 +2,5 @@
 
 public interface IScorekeepingService
 {
-    MatchScoreDto CalculateScore(MatchDto match, IEnumerable<PointDto> points);
+    MatchDto CalculateScore(MatchDto match, IEnumerable<PointDto> points);
 }

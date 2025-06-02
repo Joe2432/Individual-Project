@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -20,7 +21,7 @@ namespace MatchManagementApp.UI.Pages.Account
 
         public async Task<IActionResult> OnGetAsync()
         {
-            var userId = await _userService.GetCurrentUserId(User);
+            var userId = await _userService.GetCurrentUserIdAsync(User);
             if (userId == null)
                 return RedirectToPage("/Account/Login");
 
@@ -33,7 +34,6 @@ namespace MatchManagementApp.UI.Pages.Account
             return Page();
         }
 
-
         public async Task<IActionResult> OnPostLogoutAsync()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
@@ -42,7 +42,7 @@ namespace MatchManagementApp.UI.Pages.Account
 
         public async Task<IActionResult> OnPostDeleteAsync()
         {
-            var userId = await _userService.GetCurrentUserId(User);
+            var userId = await _userService.GetCurrentUserIdAsync(User);
             if (userId != null)
             {
                 await _userService.DeleteUserAsync(userId.Value);

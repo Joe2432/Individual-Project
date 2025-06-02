@@ -1,71 +1,70 @@
 ﻿using System.Security.Claims;
+using System.Threading.Tasks;
 using Xunit;
 using Moq;
 
-namespace MatchManagementApp.Tests.Services;
-
-public class PointServiceTests
+namespace MatchManagementApp.Tests.Services
 {
-    private readonly Mock<IPointRepository> _pointRepositoryMock;
-    private readonly Mock<IUserService> _userServiceMock;
-    private readonly PointService _pointService;
-    private readonly ClaimsPrincipal _mockUser;
-
-    public PointServiceTests()
+    public class PointServiceTests
     {
-        _pointRepositoryMock = new Mock<IPointRepository>();
-        _userServiceMock = new Mock<IUserService>();
+        private readonly Mock<IPointRepository> _pointRepositoryMock;
+        private readonly Mock<IUserService> _userServiceMock;
+        private readonly PointService _pointService;
+        private readonly ClaimsPrincipal _mockUser;
 
-        _pointService = new PointService(_pointRepositoryMock.Object, _userServiceMock.Object);
-
-        // Mock ClaimsPrincipal with user ID 1
-        _mockUser = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+        public PointServiceTests()
         {
-            new Claim(ClaimTypes.NameIdentifier, "1")
-        }, "mock"));
-    }
+            _pointRepositoryMock = new Mock<IPointRepository>();
+            _userServiceMock = new Mock<IUserService>();
 
-    [Fact]
-    public async Task RegisterPointAsync_ShouldAddPoint_WhenUserIsAuthenticated()
-    {
-        // Arrange
-        var dto = PointDtoFactory.UserWin();
-        _userServiceMock.Setup(u => u.GetCurrentUserId(_mockUser)).ReturnsAsync(1);
+            _pointService = new PointService(_pointRepositoryMock.Object, _userServiceMock.Object);
 
-        // Act
-        await _pointService.RegisterPointAsync(dto, _mockUser);
+            _mockUser = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+            {
+                new Claim(ClaimTypes.NameIdentifier, "1")
+            }, "mock"));
+        }
 
-        // Assert
-        _pointRepositoryMock.Verify(r => r.AddPointAsync(dto), Times.Once);
-    }
+        [Fact]
+        public async Task RegisterPointAsync_ShouldAddPoint_WhenUserIsAuthenticated()
+        {
+            var dto = PointDtoFactory.UserWin();
+            _userServiceMock
+                .Setup(u => u.GetCurrentUserIdAsync(_mockUser))
+                .ReturnsAsync(1);
 
-    [Fact]
-    public async Task RegisterPointAsync_ShouldThrow_WhenUserNotAuthenticated()
-    {
-        // Arrange
-        var dto = PointDtoFactory.UserWin();
-        var anonymousUser = new ClaimsPrincipal(); // No claims
-        _userServiceMock.Setup(u => u.GetCurrentUserId(anonymousUser)).ReturnsAsync((int?)null);
+            await _pointService.RegisterPointAsync(dto, _mockUser);
 
-        // Act & Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(() => _pointService.RegisterPointAsync(dto, anonymousUser));
-    }
+            _pointRepositoryMock.Verify(r => r.AddPointAsync(dto), Times.Once);
+        }
 
-    [Fact]
-    public async Task GetPointsForMatchAsync_ShouldReturnPoints()
-    {
-        // Arrange
-        int matchId = 1;
-        var expectedPoints = PointDtoFactory.SimulatedGamePoints(true);
+        [Fact]
+        public async Task RegisterPointAsync_ShouldThrow_WhenUserNotAuthenticated()
+        {
+            var dto = PointDtoFactory.UserWin();
+            var anonymousUser = new ClaimsPrincipal();
+            _userServiceMock
+                .Setup(u => u.GetCurrentUserIdAsync(anonymousUser))
+                .ReturnsAsync((int?)null);
 
-        _pointRepositoryMock.Setup(r => r.GetPointsByMatchIdAsync(matchId))
-                            .ReturnsAsync(expectedPoints);
+            await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                _pointService.RegisterPointAsync(dto, anonymousUser));
+        }
 
-        // Act
-        var result = await _pointService.GetPointsForMatchAsync(matchId, _mockUser);
+        [Fact]
+        public async Task GetPointsForMatchAsync_ShouldReturnPoints()
+        {
+            int matchId = 1;
+            var expectedPoints = PointDtoFactory.SimulatedGamePoints(true);
 
-        // Assert
-        Assert.Equal(expectedPoints.Count, result.Count);
-        Assert.All(result, p => Assert.True(p.IsUserWinner));
+            _pointRepositoryMock
+                .Setup(r => r.GetPointsByMatchIdAsync(matchId))
+                .ReturnsAsync(expectedPoints);
+
+            var result = await _pointService.GetPointsForMatchAsync(matchId, _mockUser);
+
+            Assert.Equal(expectedPoints.Count, result.Count);
+            Assert.All(result, p => Assert.True(p.IsUserWinner));
+        }
     }
 }

@@ -1,18 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-public class ScorekeepingService : IScorekeepingService
+﻿public class ScorekeepingService : IScorekeepingService
 {
     private const int GAMES_TO_WIN_SET = 6;
     private const int SET_TIEBREAK_MIN_GAMES = 6;
     private const int TIEBREAK_POINTS = 7;
     private const int SUPER_TIEBREAK_POINTS = 10;
 
-    public MatchScoreDto CalculateScore(MatchDto match, IEnumerable<PointDto> pointList)
+    public MatchDto CalculateScore(MatchDto match, IEnumerable<PointDto> pointList)
     {
         var points = pointList.ToList();
-        var result = new MatchScoreDto();
         var sets = new List<SetScoreDto> { new() };
 
         int maxSets = match.NrSets;
@@ -55,7 +50,7 @@ public class ScorekeepingService : IScorekeepingService
                     sets[setIndex].Player1Games = p1Tiebreak;
                     sets[setIndex].Player2Games = p2Tiebreak;
                     sets[setIndex].TiebreakScore = null;
-                    matchOver = true;
+                    match.MatchOver = true;
                     break;
                 }
             }
@@ -117,7 +112,7 @@ public class ScorekeepingService : IScorekeepingService
 
             if (p1Sets == setsToWin || p2Sets == setsToWin)
             {
-                result.MatchOver = true;
+                match.MatchOver = true;
                 matchOver = true;
                 break;
             }
@@ -129,15 +124,15 @@ public class ScorekeepingService : IScorekeepingService
             sets[setIndex].Player2Games = p2Games;
         }
 
-        result.Player1SetsWon = p1Sets;
-        result.Player2SetsWon = p2Sets;
-        result.SetScores = sets;
-        result.InTiebreak = inTiebreak || inMaxiTiebreak;
-        result.CurrentGameScore = inTiebreak || inMaxiTiebreak
+        match.SetScores = sets;
+        match.InTiebreak = inTiebreak || inMaxiTiebreak;
+        match.CurrentGameScore = inTiebreak || inMaxiTiebreak
             ? $"{p1Tiebreak} - {p2Tiebreak}"
             : FormatGameScore(p1Points, p2Points, false, noAd || decisivePoint);
 
-        return result;
+        match.ScoreSummary = BuildScoreSummary(sets);
+
+        return match;
     }
 
     private string FormatGameScore(int p1, int p2, bool tiebreak, bool suddenDeath)
@@ -155,5 +150,25 @@ public class ScorekeepingService : IScorekeepingService
         string s1 = p1 >= scores.Length ? "Game" : scores[p1];
         string s2 = p2 >= scores.Length ? "Game" : scores[p2];
         return $"{s1} - {s2}";
+    }
+
+    private string BuildScoreSummary(List<SetScoreDto> sets)
+    {
+        var parts = new List<string>();
+
+        foreach (var set in sets)
+        {
+            if (set.Player1Games == 0 && set.Player2Games == 0) continue;
+
+            var score = $"{set.Player1Games}-{set.Player2Games}";
+            if (set.TiebreakScore.HasValue)
+            {
+                score += $"({set.TiebreakScore})";
+            }
+
+            parts.Add(score);
+        }
+
+        return parts.Count > 0 ? string.Join(", ", parts) : "-";
     }
 }
