@@ -7,60 +7,28 @@
         _scorekeepingService = scorekeepingService;
     }
 
-    public ServeState GetServeState(MatchDto match, List<PointDto> points)
+    public PointDto GetServeState(MatchDto match, List<PointDto> points)
     {
-        string server = match.InitialServer;
+        var score = _scorekeepingService.CalculateScore(match, points);
+        int gamesPlayed = score.SetScores.Sum(s => s.Player1Games + s.Player2Games);
+
+        string initialServer = match.InitialServer; // "User" or "Opponent"
+        string currentServer = (gamesPlayed % 2 == 0) ? initialServer : (initialServer == "User" ? "Opponent" : "User");
+
+        // Determine serve number (first/second) from the most recent point
         bool isFirstServe = true;
-
-        foreach (var point in points)
+        if (points.Count > 0)
         {
-            if (IsGameOverByThisPoint(points, point, match))
-            {
-                server = (server == "User") ? "Opponent" : "User";
-                isFirstServe = true;
-                continue;
-            }
-
-            if (point.PointType == "Fault")
-            {
-                if (isFirstServe) isFirstServe = false;
-                else isFirstServe = true;
-            }
-            else if (point.PointType == "Double Fault" ||
-                     point.PointType == "Ace" ||
-                     point.PointType == "Winner" ||
-                     point.PointType == "Unforced Error" ||
-                     point.PointType == "Forced Error")
-            {
-                isFirstServe = true;
-            }
+            var last = points.Last();
+            if (last.PointType == "Fault" && last.IsFirstServe)
+                isFirstServe = false;
         }
 
-        return new ServeState
+        // Return a PointDto with only these two properties set
+        return new PointDto
         {
-            CurrentServer = server,
+            CurrentServer = currentServer,
             IsFirstServe = isFirstServe
         };
-    }
-
-    private bool IsGameOverByThisPoint(List<PointDto> points, PointDto current, MatchDto match)
-    {
-        int idx = points.IndexOf(current);
-        var before = points.Take(idx).ToList();
-        var after = points.Take(idx + 1).ToList();
-
-        var beforeScore = _scorekeepingService.CalculateScore(match, before);
-        var afterScore = _scorekeepingService.CalculateScore(match, after);
-
-        if (beforeScore.SetScores.Count == afterScore.SetScores.Count)
-        {
-            var b = beforeScore.SetScores.Last();
-            var a = afterScore.SetScores.Last();
-            return (a.Player1Games > b.Player1Games) || (a.Player2Games > b.Player2Games);
-        }
-        else
-        {
-            return true;
-        }
     }
 }

@@ -5,4 +5,5 @@
     public int NumberOfShots { get; set; }
     public bool IsUserWinner { get; set; }
     public bool IsFirstServe { get; set; }
+    public string? CurrentServer { get; set; }
 }

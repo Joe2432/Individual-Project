@@ -8,7 +8,8 @@
             PointType = vm.PointType,
             NumberOfShots = vm.NumberOfShots,
             IsUserWinner = vm.IsUserWinner,
-            IsFirstServe = vm.IsFirstServe
+            IsFirstServe = vm.IsFirstServe,
+            CurrentServer = vm.CurrentServer
         };
     }
 
@@ -20,7 +21,8 @@
             PointType = dto.PointType ?? string.Empty,
             NumberOfShots = dto.NumberOfShots,
             IsUserWinner = dto.IsUserWinner,
-            IsFirstServe = dto.IsFirstServe
+            IsFirstServe = dto.IsFirstServe,
+            CurrentServer = dto.CurrentServer ?? string.Empty
         };
     }
 }

@@ -41,13 +41,17 @@ namespace MatchManagementApp.UI.Pages
 
             var points = await _pointService.GetPointsForMatchAsync(id, User);
 
+            var serveState = _serveStateService.GetServeState(match, points);
+
             MatchViewModel = PlayMatchMapper.ToViewModel(match, points, _serveStateService);
 
             Point.MatchId = id;
-            Point.IsFirstServe = MatchViewModel.IsFirstServe;
+            Point.IsFirstServe = serveState.IsFirstServe;
+            Point.CurrentServer = serveState.CurrentServer;
 
             return Page();
         }
+
 
         public async Task<IActionResult> OnPostAsync()
         {
@@ -55,13 +59,37 @@ namespace MatchManagementApp.UI.Pages
             if (userId == null)
                 return RedirectToPage("/Account/Login");
 
-            // Ensure all Point fields are populated (MatchId, IsUserWinner, etc.)
-            // (They should be posted from the form)
-            var dto = PointMapper.ToDto(Point);
+            var points = await _pointService.GetPointsForMatchAsync(Point.MatchId, User);
+            var match = await _matchService.GetMatchForPlayingAsync(Point.MatchId, userId.Value);
 
-            await _pointService.RegisterPointAsync(dto, User);
+            var serveState = _serveStateService.GetServeState(match, points);
 
-            return RedirectToPage(new { id = Point.MatchId });
+            Point.IsFirstServe = serveState.IsFirstServe;
+            Point.CurrentServer = serveState.CurrentServer; // Add this line
+
+            if (Point.PointType == "Fault" && Point.IsFirstServe)
+            {
+                Point.IsFirstServe = false;
+                Point.CurrentServer = serveState.CurrentServer; // Still current server
+                MatchViewModel = PlayMatchMapper.ToViewModel(match, points, _serveStateService);
+                return Page();
+            }
+            else if (Point.PointType == "Fault" && !Point.IsFirstServe)
+            {
+                Point.PointType = "Double Fault";
+                Point.IsUserWinner = false;
+                Point.IsFirstServe = true;
+                Point.CurrentServer = serveState.CurrentServer;
+                await _pointService.RegisterPointAsync(PointMapper.ToDto(Point), User);
+                return RedirectToPage(new { id = Point.MatchId });
+            }
+            else
+            {
+                Point.IsFirstServe = true;
+                Point.CurrentServer = serveState.CurrentServer;
+                await _pointService.RegisterPointAsync(PointMapper.ToDto(Point), User);
+                return RedirectToPage(new { id = Point.MatchId });
+            }
         }
     }
 }
