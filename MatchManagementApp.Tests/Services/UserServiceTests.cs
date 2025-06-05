@@ -29,8 +29,8 @@ public class UserServiceTests
 
         _userRepoMock
             .SetupSequence(r => r.GetUserByUsernameAsync(dto.Username))
-            .ReturnsAsync((UserDto?)null) // First check: username not taken
-            .ReturnsAsync(dto);           // After creation, simulate success
+            .ReturnsAsync((UserDto?)null)
+            .ReturnsAsync(dto);
 
         _userRepoMock
             .Setup(r => r.CreateUserAsync(dto))
@@ -58,7 +58,7 @@ public class UserServiceTests
         var existingUser = UserDtoFactory.ValidUser();
 
         _userRepoMock.Setup(r => r.GetUserByUsernameAsync(existingUser.Username))
-                     .ReturnsAsync(existingUser); // Conflict found
+                     .ReturnsAsync(existingUser);
 
         // Act
         var result = await _userService.TryRegisterAsync(existingUser);
@@ -118,7 +118,7 @@ public class UserServiceTests
         var hash = _userService.HashPassword(plain);
 
         // Assert
-        Assert.True(hash.StartsWith("$2")); // BCrypt hash
+        Assert.True(hash.StartsWith("$2"));
         Assert.True(BCrypt.Net.BCrypt.Verify(plain, hash));
     }
 }

@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System.Threading.Tasks;
 
 namespace MatchManagementApp.UI.Pages
 {
@@ -32,15 +34,12 @@ namespace MatchManagementApp.UI.Pages
         public async Task<IActionResult> OnGetAsync(int id)
         {
             var userId = await _userService.GetCurrentUserIdAsync(User);
-            if (userId == null)
-                return RedirectToPage("/Account/Login");
+            if (userId == null) return RedirectToPage("/Account/Login");
 
             var match = await _matchService.GetMatchForPlayingAsync(id, userId.Value);
-            if (match == null)
-                return NotFound();
+            if (match == null) return NotFound();
 
             var points = await _pointService.GetPointsForMatchAsync(id, User);
-
             var serveState = _serveStateService.GetServeState(match, points);
 
             MatchViewModel = PlayMatchMapper.ToViewModel(match, points, _serveStateService);
@@ -48,48 +47,59 @@ namespace MatchManagementApp.UI.Pages
             Point.MatchId = id;
             Point.IsFirstServe = serveState.IsFirstServe;
             Point.CurrentServer = serveState.CurrentServer;
+            Point.NumberOfShots = 0;
 
             return Page();
         }
 
-
         public async Task<IActionResult> OnPostAsync()
         {
             var userId = await _userService.GetCurrentUserIdAsync(User);
-            if (userId == null)
-                return RedirectToPage("/Account/Login");
+            if (userId == null) return RedirectToPage("/Account/Login");
+
+            var match = await _matchService.GetMatchForPlayingAsync(Point.MatchId, userId.Value);
+            if (match == null) return NotFound();
 
             var points = await _pointService.GetPointsForMatchAsync(Point.MatchId, User);
-            var match = await _matchService.GetMatchForPlayingAsync(Point.MatchId, userId.Value);
-
             var serveState = _serveStateService.GetServeState(match, points);
 
-            Point.IsFirstServe = serveState.IsFirstServe;
-            Point.CurrentServer = serveState.CurrentServer; // Add this line
+            Point.CurrentServer = serveState.CurrentServer;
 
-            if (Point.PointType == "Fault" && Point.IsFirstServe)
+            if (Request.Form.ContainsKey("IncrementShot"))
             {
-                Point.IsFirstServe = false;
-                Point.CurrentServer = serveState.CurrentServer; // Still current server
+                Point.NumberOfShots++;
+                ModelState.Remove("Point.NumberOfShots");
+
                 MatchViewModel = PlayMatchMapper.ToViewModel(match, points, _serveStateService);
                 return Page();
             }
-            else if (Point.PointType == "Fault" && !Point.IsFirstServe)
+
+            if (Point.PointType == "Fault")
             {
-                Point.PointType = "Double Fault";
-                Point.IsUserWinner = false;
-                Point.IsFirstServe = true;
-                Point.CurrentServer = serveState.CurrentServer;
-                await _pointService.RegisterPointAsync(PointMapper.ToDto(Point), User);
-                return RedirectToPage(new { id = Point.MatchId });
+                if (Point.IsFirstServe)
+                {
+                    Point.IsFirstServe = false;
+                    ModelState.Remove("Point.IsFirstServe");
+
+                    MatchViewModel = PlayMatchMapper.ToViewModel(match, points, _serveStateService);
+                    return Page();
+                }
+                else
+                {
+                    Point.PointType = "Double Fault";
+                    Point.IsUserWinner = !Point.IsUserWinner;
+                    await _pointService.RegisterPointAsync(PointMapper.ToDto(Point), User);
+                    return RedirectToPage(new { id = Point.MatchId });
+                }
             }
-            else
+
+            if (Point.PointType == "Unforced Error" || Point.PointType == "Forced Error")
             {
-                Point.IsFirstServe = true;
-                Point.CurrentServer = serveState.CurrentServer;
-                await _pointService.RegisterPointAsync(PointMapper.ToDto(Point), User);
-                return RedirectToPage(new { id = Point.MatchId });
+                Point.IsUserWinner = !Point.IsUserWinner;
             }
+
+            await _pointService.RegisterPointAsync(PointMapper.ToDto(Point), User);
+            return RedirectToPage(new { id = Point.MatchId });
         }
     }
 }

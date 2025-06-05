@@ -1,8 +1,6 @@
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MatchManagementApp.UI.ViewModels;
 
 namespace MatchManagementApp.UI.Pages
 {
@@ -12,7 +10,7 @@ namespace MatchManagementApp.UI.Pages
         private readonly IAnalysisService _analysisService;
         private readonly IUserService _userService;
 
-        public AnalysisViewModel ViewModel { get; private set; }
+        public AnalysisViewModel? ViewModel { get; private set; }
 
         public AnalysisModel(IAnalysisService analysisService, IUserService userService)
         {
@@ -26,10 +24,10 @@ namespace MatchManagementApp.UI.Pages
             if (userId == null)
                 return RedirectToPage("/Account/Login");
 
-            var dto = await _analysisService.GetAnalysisAsync(id, userId.Value)
-                           .ConfigureAwait(false);
-
+            var dto = await _analysisService.GetAnalysisAsync(id, userId.Value);
             ViewModel = AnalysisMapper.ToViewModel(dto);
+            if (ViewModel == null)
+                return NotFound();
 
             return Page();
         }

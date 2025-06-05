@@ -16,6 +16,4 @@
         DateTime? date,
         DateTime? dateFrom,
         DateTime? dateTo);
-
-    Task UpdateInitialServerAsync(int matchId, string initialServer); // <-- Add this line
 }

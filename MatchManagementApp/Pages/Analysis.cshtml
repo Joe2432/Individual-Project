@@ -1,129 +1,72 @@
 ﻿@page "{id:int}"
 @model MatchManagementApp.UI.Pages.AnalysisModel
+@using Microsoft.AspNetCore.Identity
 @{
     ViewData["Title"] = "Match Analysis";
-    var vm = Model.ViewModel;
 }
 
-<h1 class="mt-3">Match Analysis</h1>
+<div class="container mt-4">
 
-@if (vm == null)
-{
-    <div class="alert alert-warning">
-        No data to display or access denied.
-    </div>
-}
-else
-{
-    <div class="card mb-4">
-        <div class="card-body">
-            <h5 class="card-title">@vm.PlayerAName vs. @vm.PlayerBName</h5>
-            <p class="card-text">
-                <strong>Match ID:</strong> @vm.MatchId
-                &nbsp;|&nbsp;
-                <strong>Date:</strong> @(vm.MatchDate?.ToString("yyyy-MM-dd HH:mm") ?? "N/A")
-            </p>
+    <div class="row mb-3">
+        <div class="col-6">
+            <h5>Hello, @User.Identity.Name!</h5>
+        </div>
+        <div class="col-6 text-end">
+            <h5>Opponent: @Model.ViewModel.PlayerAName</h5>
         </div>
     </div>
 
-    <div class="card mb-4">
-        <div class="card-header bg-secondary text-white">
-            Set-by-Set Score
-        </div>
-        <div class="card-body p-0">
-            <table class="table table-sm table-striped mb-0 text-center">
-                <thead>
-                    <tr>
-                        <th></th>
-                        @for (int i = 0; i < vm.PlayerAGameByGame.Count; i++)
-                        {
-                            <th>Set @(i + 1)</th>
-                        }
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <th>@vm.PlayerAName</th>
-                        @foreach (var setScore in vm.PlayerAGameByGame)
-                        {
-                            <td>@(setScore.Split('-')[0])</td>
-                        }
-                    </tr>
-                    <tr>
-                        <th>@vm.PlayerBName</th>
-                        @foreach (var setScore in vm.PlayerBGameByGame)
-                        {
-                            <td>@(setScore.Split('-')[1].Split('(')[0])</td>
-                        }
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
+    <hr />
 
-    <div class="card">
-        <div class="card-header bg-secondary text-white">
-            Point Statistics
-        </div>
-        <div class="card-body p-0">
-            <div class="d-none d-md-grid"
-                 style="grid-template-columns: 1fr 2fr 1fr; row-gap: 1rem; column-gap: 1rem; padding: 1rem;">
-                <div class="text-end fw-bold">@vm.PlayerAName</div>
-                <div class="text-center fw-bold">Statistic</div>
-                <div class="text-start fw-bold">@vm.PlayerBName</div>
+    <div>
+        <h3>Match Date: @Model.ViewModel.MatchDate?.ToString("dd MMM yyyy")</h3>
+        <p><strong>Score:</strong></p>
+        <ul class="list-group mb-4">
+            @foreach (var score in Model.ViewModel.PlayerAGameByGame)
+            {
+                <li class="list-group-item">@score</li>
+            }
+        </ul>
 
-                <div class="text-end">@vm.AcesPlayerA</div>
-                <div class="text-center">Aces</div>
-                <div class="text-start">@vm.AcesPlayerB</div>
-
-                <div class="text-end">@vm.DoubleFaultsPlayerA</div>
-                <div class="text-center">Double Faults</div>
-                <div class="text-start">@vm.DoubleFaultsPlayerB</div>
-
-                <div class="text-end">@vm.WinnersPlayerA</div>
-                <div class="text-center">Winners</div>
-                <div class="text-start">@vm.WinnersPlayerB</div>
-
-                <div class="text-end">@vm.UnforcedErrorsPlayerA</div>
-                <div class="text-center">Unforced Errors</div>
-                <div class="text-start">@vm.UnforcedErrorsPlayerB</div>
-
-                <div class="text-end">@vm.ForcedErrorsPlayerA</div>
-                <div class="text-center">Forced Errors</div>
-                <div class="text-start">@vm.ForcedErrorsPlayerB</div>
-
-                <div class="text-end">@vm.TotalPointsPlayerA</div>
-                <div class="text-center">Points Won</div>
-                <div class="text-start">@vm.TotalPointsPlayerB</div>
-
-                <div class="text-end">@vm.TotalGamesPlayerA</div>
-                <div class="text-center">Games Won</div>
-                <div class="text-start">@vm.TotalGamesPlayerB</div>
+        <div class="row">
+            <div class="col-md-6">
+                <p><strong>Aces:</strong> @Model.ViewModel.AcesPlayerA</p>
+                <p><strong>Double Faults:</strong> @Model.ViewModel.DoubleFaultsPlayerA</p>
+                <p><strong>1st Serve %:</strong> @Model.ViewModel.FirstServePctA %</p>
+                <p><strong>Win % on 1st Serve:</strong> @Model.ViewModel.WinPctOnFirstServeA %</p>
+                <p><strong>Win % on 2nd Serve:</strong> @Model.ViewModel.WinPctOnSecondServeA %</p>
+                <p><strong>Break Points:</strong> @Model.ViewModel.BreakPointsWonA/@Model.ViewModel.BreakPointsOpportunitiesA</p>
+                <p><strong>Tiebreaks Won:</strong> @Model.ViewModel.TiebreaksWonA</p>
+                <p><strong>Receiving Points Won:</strong> @Model.ViewModel.ReceivingPointsWonA</p>
+                <p><strong>Points Won:</strong> @Model.ViewModel.PointsWonA</p>
+                <p><strong>Games Won:</strong> @Model.ViewModel.GamesWonA</p>
+                <p><strong>Max Games in a Row:</strong> @Model.ViewModel.MaxGamesInARowA</p>
+                <p><strong>Max Points in a Row:</strong> @Model.ViewModel.MaxPointsInARowA</p>
+                <p><strong>Service Points Won:</strong> @Model.ViewModel.ServicePointsWonA</p>
+                <p><strong>Service Games Won:</strong> @Model.ViewModel.ServiceGamesWonA</p>
+                <p><strong>Total Shots:</strong> @Model.ViewModel.TotalShotsPlayerA</p>
+                <p><strong>Avg Shots/Point:</strong> @Model.ViewModel.AvgShotsPerPointA</p>
+                <p><strong>Max Shots in a Point:</strong> @Model.ViewModel.MaxShotsInPointA</p>
             </div>
-
-            <div class="d-block d-md-none p-3">
-                <div class="mb-2">
-                    <strong>Aces:</strong> @vm.PlayerAName (@vm.AcesPlayerA) – (@vm.AcesPlayerB) @vm.PlayerBName
-                </div>
-                <div class="mb-2">
-                    <strong>Double Faults:</strong> @vm.PlayerAName (@vm.DoubleFaultsPlayerA) – (@vm.DoubleFaultsPlayerB) @vm.PlayerBName
-                </div>
-                <div class="mb-2">
-                    <strong>Winners:</strong> @vm.PlayerAName (@vm.WinnersPlayerA) – (@vm.WinnersPlayerB) @vm.PlayerBName
-                </div>
-                <div class="mb-2">
-                    <strong>Unforced Errors:</strong> @vm.PlayerAName (@vm.UnforcedErrorsPlayerA) – (@vm.UnforcedErrorsPlayerB) @vm.PlayerBName
-                </div>
-                <div class="mb-2">
-                    <strong>Forced Errors:</strong> @vm.PlayerAName (@vm.ForcedErrorsPlayerA) – (@vm.ForcedErrorsPlayerB) @vm.PlayerBName
-                </div>
-                <div class="mb-2">
-                    <strong>Points Won:</strong> @vm.PlayerAName (@vm.TotalPointsPlayerA) – (@vm.TotalPointsPlayerB) @vm.PlayerBName
-                </div>
-                <div class="mb-2">
-                    <strong>Games Won:</strong> @vm.PlayerAName (@vm.TotalGamesPlayerA) – (@vm.TotalGamesPlayerB) @vm.PlayerBName
-                </div>
+            <div class="col-md-6 text-end">
+                <p><strong>Aces:</strong> @Model.ViewModel.AcesPlayerB</p>
+                <p><strong>Double Faults:</strong> @Model.ViewModel.DoubleFaultsPlayerB</p>
+                <p><strong>1st Serve %:</strong> @Model.ViewModel.FirstServePctB %</p>
+                <p><strong>Win % on 1st Serve:</strong> @Model.ViewModel.WinPctOnFirstServeB %</p>
+                <p><strong>Win % on 2nd Serve:</strong> @Model.ViewModel.WinPctOnSecondServeB %</p>
+                <p><strong>Break Points:</strong> @Model.ViewModel.BreakPointsWonB/@Model.ViewModel.BreakPointsOpportunitiesB</p>
+                <p><strong>Tiebreaks Won:</strong> @Model.ViewModel.TiebreaksWonB</p>
+                <p><strong>Receiving Points Won:</strong> @Model.ViewModel.ReceivingPointsWonB</p>
+                <p><strong>Points Won:</strong> @Model.ViewModel.PointsWonB</p>
+                <p><strong>Games Won:</strong> @Model.ViewModel.GamesWonB</p>
+                <p><strong>Max Games in a Row:</strong> @Model.ViewModel.MaxGamesInARowB</p>
+                <p><strong>Max Points in a Row:</strong> @Model.ViewModel.MaxPointsInARowB</p>
+                <p><strong>Service Points Won:</strong> @Model.ViewModel.ServicePointsWonB</p>
+                <p><strong>Service Games Won:</strong> @Model.ViewModel.ServiceGamesWonB</p>
+                <p><strong>Total Shots:</strong> @Model.ViewModel.TotalShotsPlayerB</p>
+                <p><strong>Avg Shots/Point:</strong> @Model.ViewModel.AvgShotsPerPointB</p>
+                <p><strong>Max Shots in a Point:</strong> @Model.ViewModel.MaxShotsInPointB</p>
             </div>
         </div>
     </div>
-}
+</div>

@@ -19,10 +19,6 @@
 
     public async Task<int> CreateMatchAsync(MatchDto matchDto)
     {
-        var user = await _userRepository.GetUserByIdAsync(matchDto.CreatedByUserId);
-        if (user == null)
-            throw new InvalidOperationException("User not found");
-
         var matchId = await _matchRepository.CreateMatchAsync(matchDto);
         matchDto.Id = matchId;
         return matchId;
@@ -139,9 +135,9 @@
             matches = matches.Where(m =>
                 (m.MatchType == "Singles" && m.FirstOpponentName.Contains(name, StringComparison.OrdinalIgnoreCase)) ||
                 (m.MatchType == "Doubles" &&
-                 (m.FirstOpponentName.Contains(name, StringComparison.OrdinalIgnoreCase) ||
-                  m.SecondOpponentName.Contains(name, StringComparison.OrdinalIgnoreCase) ||
-                  m.PartnerName.Contains(name, StringComparison.OrdinalIgnoreCase)))
+                    (m.FirstOpponentName.Contains(name, StringComparison.OrdinalIgnoreCase) ||
+                     m.SecondOpponentName.Contains(name, StringComparison.OrdinalIgnoreCase) ||
+                     m.PartnerName.Contains(name, StringComparison.OrdinalIgnoreCase)))
             ).ToList();
         }
 
@@ -181,9 +177,4 @@
 
         return matches;
     }
-    public async Task UpdateInitialServerAsync(int matchId, string initialServer)
-    {
-        await _matchRepository.UpdateInitialServerAsync(matchId, initialServer);
-    }
-
 }

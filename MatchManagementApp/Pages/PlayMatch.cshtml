@@ -71,7 +71,7 @@ else if (Model.MatchViewModel != null)
             }
             else
             {
-                <text>@(Model.MatchViewModel.IsFirstServe ? "First Serve" : "Second Serve")</text>
+                @(Model.Point.IsFirstServe ? "First Serve" : "Second Serve")
             }
         </span>
     </div>
@@ -82,17 +82,31 @@ else if (Model.MatchViewModel != null)
             <form method="post">
                 <input type="hidden" asp-for="Point.MatchId" />
                 <input type="hidden" name="Point.IsUserWinner" value="true" />
-                <input type="hidden" name="Point.IsFirstServe" value="@Model.MatchViewModel.IsFirstServe.ToString().ToLower()" />
+                <input type="hidden" name="Point.IsFirstServe" value="@Model.Point.IsFirstServe.ToString().ToLower()" />
                 <input type="hidden" asp-for="Point.NumberOfShots" />
-                @* Ace and Fault/Double Fault ONLY VISIBLE if you are the server *@
+
+                <button type="submit" name="IncrementShot" class="btn btn-secondary m-1">
+                    Shot (@Model.Point.NumberOfShots)
+                </button>
+
                 @if (Model.MatchViewModel.CurrentServer == "User")
                 {
-                    <button type="submit" name="Point.PointType" value="Ace" class="btn btn-success m-1" @(Model.MatchViewModel.IsFirstServe ? "" : "disabled")>Ace</button>
-                    <button type="submit" name="Point.PointType" value="Fault" class="btn btn-warning m-1">
-                        @(Model.MatchViewModel.IsFirstServe ? "Fault" : "Double Fault")
+                    <button type="submit"
+                            name="Point.PointType"
+                            value="Ace"
+                            class="btn btn-danger m-1"
+                            @(Model.Point.NumberOfShots >= 1 ? "disabled" : "")>
+                        Ace
                     </button>
+                    <button type="submit"
+                            name="Point.PointType"
+                            value="Fault"
+                            class="btn btn-warning m-1"
+                            @(Model.Point.NumberOfShots >= 1 ? "disabled" : "")>
+                        Fault
+                    </button>
+
                 }
-                @* Winner, Unforced Error, Forced Error ALWAYS VISIBLE *@
                 <button type="submit" name="Point.PointType" value="Winner" class="btn btn-primary m-1">Winner</button>
                 <button type="submit" name="Point.PointType" value="Unforced Error" class="btn btn-secondary m-1">Unforced Error</button>
                 <button type="submit" name="Point.PointType" value="Forced Error" class="btn btn-secondary m-1">Forced Error</button>
@@ -103,17 +117,31 @@ else if (Model.MatchViewModel != null)
             <form method="post">
                 <input type="hidden" asp-for="Point.MatchId" />
                 <input type="hidden" name="Point.IsUserWinner" value="false" />
-                <input type="hidden" name="Point.IsFirstServe" value="@Model.MatchViewModel.IsFirstServe.ToString().ToLower()" />
+                <input type="hidden" name="Point.IsFirstServe" value="@Model.Point.IsFirstServe.ToString().ToLower()" />
                 <input type="hidden" asp-for="Point.NumberOfShots" />
-                @* Ace and Fault/Double Fault ONLY VISIBLE if opponent is the server *@
+
+                <button type="submit" name="IncrementShot" class="btn btn-secondary m-1">
+                    Shot (@Model.Point.NumberOfShots)
+                </button>
+
                 @if (Model.MatchViewModel.CurrentServer == "Opponent")
                 {
-                    <button type="submit" name="Point.PointType" value="Ace" class="btn btn-danger m-1" @(Model.MatchViewModel.IsFirstServe ? "" : "disabled")>Ace</button>
-                    <button type="submit" name="Point.PointType" value="Fault" class="btn btn-warning m-1">
-                        @(Model.MatchViewModel.IsFirstServe ? "Fault" : "Double Fault")
+                    <button type="submit"
+                            name="Point.PointType"
+                            value="Ace"
+                            class="btn btn-danger m-1"
+                            @(Model.Point.NumberOfShots >= 1 ? "disabled" : "")>
+                        Ace
                     </button>
+                    <button type="submit"
+                            name="Point.PointType"
+                            value="Fault"
+                            class="btn btn-warning m-1"
+                            @(Model.Point.NumberOfShots >= 1 ? "disabled" : "")>
+                        Fault
+                    </button>
+
                 }
-                @* Winner, Unforced Error, Forced Error ALWAYS VISIBLE *@
                 <button type="submit" name="Point.PointType" value="Winner" class="btn btn-danger m-1">Winner</button>
                 <button type="submit" name="Point.PointType" value="Unforced Error" class="btn btn-danger m-1">Unforced Error</button>
                 <button type="submit" name="Point.PointType" value="Forced Error" class="btn btn-danger m-1">Forced Error</button>

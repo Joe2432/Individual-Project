@@ -1,6 +1,4 @@
-﻿using MatchManagementApp.UI.ViewModels;
-
-public static class AnalysisMapper
+﻿public static class AnalysisMapper
 {
     public static AnalysisViewModel ToViewModel(AnalysisDto dto)
     {
@@ -12,20 +10,51 @@ public static class AnalysisMapper
             MatchDate = dto.MatchDate,
             PlayerAGameByGame = dto.PlayerAGameByGame.ToList(),
             PlayerBGameByGame = dto.PlayerBGameByGame.ToList(),
+
             AcesPlayerA = dto.AcesPlayerA,
             AcesPlayerB = dto.AcesPlayerB,
             DoubleFaultsPlayerA = dto.DoubleFaultsPlayerA,
             DoubleFaultsPlayerB = dto.DoubleFaultsPlayerB,
-            WinnersPlayerA = dto.WinnersPlayerA,
-            WinnersPlayerB = dto.WinnersPlayerB,
-            UnforcedErrorsPlayerA = dto.UnforcedErrorsPlayerA,
-            UnforcedErrorsPlayerB = dto.UnforcedErrorsPlayerB,
-            ForcedErrorsPlayerA = dto.ForcedErrorsPlayerA,
-            ForcedErrorsPlayerB = dto.ForcedErrorsPlayerB,
-            TotalPointsPlayerA = dto.TotalPointsPlayerA,
-            TotalPointsPlayerB = dto.TotalPointsPlayerB,
-            TotalGamesPlayerA = dto.TotalGamesPlayerA,
-            TotalGamesPlayerB = dto.TotalGamesPlayerB
+
+            FirstServePctA = dto.FirstServePctA,
+            FirstServePctB = dto.FirstServePctB,
+            WinPctOnFirstServeA = dto.WinPctOnFirstServeA,
+            WinPctOnFirstServeB = dto.WinPctOnFirstServeB,
+            WinPctOnSecondServeA = dto.WinPctOnSecondServeA,
+            WinPctOnSecondServeB = dto.WinPctOnSecondServeB,
+
+            BreakPointsWonA = dto.BreakPointsWonA,
+            BreakPointsOpportunitiesA = dto.BreakPointsOpportunitiesA,
+            BreakPointsWonB = dto.BreakPointsWonB,
+            BreakPointsOpportunitiesB = dto.BreakPointsOpportunitiesB,
+
+            TiebreaksWonA = dto.TiebreaksWonA,
+            TiebreaksWonB = dto.TiebreaksWonB,
+
+            ReceivingPointsWonA = dto.ReceivingPointsWonA,
+            ReceivingPointsWonB = dto.ReceivingPointsWonB,
+
+            PointsWonA = dto.PointsWonA,
+            PointsWonB = dto.PointsWonB,
+            GamesWonA = dto.GamesWonA,
+            GamesWonB = dto.GamesWonB,
+
+            MaxGamesInARowA = dto.MaxGamesInARowA,
+            MaxGamesInARowB = dto.MaxGamesInARowB,
+            MaxPointsInARowA = dto.MaxPointsInARowA,
+            MaxPointsInARowB = dto.MaxPointsInARowB,
+
+            ServicePointsWonA = dto.ServicePointsWonA,
+            ServicePointsWonB = dto.ServicePointsWonB,
+            ServiceGamesWonA = dto.ServiceGamesWonA,
+            ServiceGamesWonB = dto.ServiceGamesWonB,
+
+            TotalShotsPlayerA = dto.TotalShotsPlayerA,
+            TotalShotsPlayerB = dto.TotalShotsPlayerB,
+            AvgShotsPerPointA = dto.AvgShotsPerPointA,
+            AvgShotsPerPointB = dto.AvgShotsPerPointB,
+            MaxShotsInPointA = dto.MaxShotsInPointA,
+            MaxShotsInPointB = dto.MaxShotsInPointB
         };
     }
 }

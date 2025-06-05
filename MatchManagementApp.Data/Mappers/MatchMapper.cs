@@ -2,7 +2,8 @@
 {
     public static MatchEntity ToEntity(this MatchDto dto)
     {
-        var match = new MatchEntity(
+        // Now the constructor requires initialServer → ensure dto carries it
+        return new MatchEntity(
             dto.CreatedByUserId,
             dto.MatchType,
             dto.FirstOpponentName,
@@ -14,8 +15,6 @@
             dto.PartnerName,
             dto.SecondOpponentName
         );
-
-        return match;
     }
 
     public static MatchDto ToDto(this MatchEntity entity)

@@ -12,10 +12,9 @@
         var score = _scorekeepingService.CalculateScore(match, points);
         int gamesPlayed = score.SetScores.Sum(s => s.Player1Games + s.Player2Games);
 
-        string initialServer = match.InitialServer; // "User" or "Opponent"
+        string initialServer = match.InitialServer;
         string currentServer = (gamesPlayed % 2 == 0) ? initialServer : (initialServer == "User" ? "Opponent" : "User");
 
-        // Determine serve number (first/second) from the most recent point
         bool isFirstServe = true;
         if (points.Count > 0)
         {
@@ -24,7 +23,6 @@
                 isFirstServe = false;
         }
 
-        // Return a PointDto with only these two properties set
         return new PointDto
         {
             CurrentServer = currentServer,

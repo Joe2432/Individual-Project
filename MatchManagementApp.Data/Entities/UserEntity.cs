@@ -18,6 +18,5 @@
         ImageUrl = imageUrl;
     }
 
-    // Required by EF Core
     private UserEntity() { }
 }

@@ -22,9 +22,6 @@ public class UserService : IUserService
 
     public async Task CreateUserAsync(UserDto dto)
     {
-        if (dto.Password is null)
-            throw new ArgumentException("Password must be provided", nameof(dto));
-
         dto.PasswordHash = HashPassword(dto.Password);
         await _userRepository.CreateUserAsync(dto);
     }

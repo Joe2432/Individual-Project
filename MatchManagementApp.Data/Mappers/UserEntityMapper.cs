@@ -7,7 +7,7 @@
             Id = entity.Id,
             Username = entity.Username,
             Email = entity.Email,
-            PasswordHash = entity.PasswordHash, // ✅ Corrected
+            PasswordHash = entity.PasswordHash,
             Age = entity.Age,
             Gender = entity.Gender
         };

@@ -26,7 +26,6 @@ namespace MatchManagementApp.UI.Pages.Account
             if (!ModelState.IsValid)
                 return Page();
 
-            // Map the ViewModel to a DTO here
             var userDto = UserMapper.ToCreateDto(UserRegistration);
 
             var registerResult = await _userService.TryRegisterAsync(userDto);

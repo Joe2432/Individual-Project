@@ -20,10 +20,18 @@
 
     private MatchEntity() { }
 
-    public MatchEntity(int createdByUserId, string matchType, string firstOpponentName,
-    int nrSets, string finalSetType, string gameFormat, string surface,
-    string initialServer,
-    string? partnerName = null, string? secondOpponentName = null)
+    public MatchEntity(
+     int createdByUserId,
+     string matchType,
+     string firstOpponentName,
+     int nrSets,
+     string finalSetType,
+     string gameFormat,
+     string surface,
+     string initialServer,
+     string? partnerName,
+     string? secondOpponentName
+ )
     {
         CreatedByUserId = createdByUserId;
         MatchType = matchType;
@@ -37,9 +45,4 @@
         SecondOpponentName = secondOpponentName;
         MatchDate = DateTime.UtcNow;
     }
-    public void SetInitialServer(string server)
-    {
-        InitialServer = server;
-    }
-
 }

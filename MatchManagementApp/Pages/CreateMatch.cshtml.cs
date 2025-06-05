@@ -1,4 +1,4 @@
-using System.Threading.Tasks;
+using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -28,11 +28,10 @@ namespace MatchManagementApp.UI.Pages
             var userId = await _userService.GetCurrentUserIdAsync(User);
             if (userId == null)
                 return RedirectToPage("/Account/Login");
-
             var dto = MatchMapper.ToCreateDto(Match, userId.Value);
-            var matchId = await _matchService.CreateMatchAsync(dto);
+            TempData["PendingMatch"] = JsonSerializer.Serialize(dto);
 
-            return RedirectToPage("/CoinToss", new { id = matchId });
+            return RedirectToPage("/CoinToss");
         }
     }
 }

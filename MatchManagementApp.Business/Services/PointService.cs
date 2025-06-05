@@ -13,8 +13,7 @@ public class PointService : IPointService
 
     public async Task RegisterPointAsync(PointDto dto, ClaimsPrincipal user)
     {
-        var userId = await _userService.GetCurrentUserIdAsync(user)
-                     ?? throw new InvalidOperationException("User not logged in.");
+        var userId = await _userService.GetCurrentUserIdAsync(user);
 
         await _pointRepository.AddPointAsync(dto);
     }
