@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+
 public interface IUserService
 {
     Task<UserDto?> GetUserByEmailAsync(string email);
@@ -13,4 +14,5 @@ public interface IUserService
     Task<AuthResultDto> TrySignInAsync(string username, string password);
     Task<AuthResultDto> TryRegisterAsync(UserDto userDto);
     Task<UserDto?> GetUserByIdAsync(int userId);
+    Task UpdateUserImageAsync(int userId, byte[] imageData);
 }

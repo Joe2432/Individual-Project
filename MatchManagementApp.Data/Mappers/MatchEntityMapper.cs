@@ -1,8 +1,7 @@
-﻿public static class MatchMapper
+﻿public static class MatchEntityMapper
 {
     public static MatchEntity ToEntity(this MatchDto dto)
     {
-        // Now the constructor requires initialServer → ensure dto carries it
         return new MatchEntity(
             dto.CreatedByUserId,
             dto.MatchType,

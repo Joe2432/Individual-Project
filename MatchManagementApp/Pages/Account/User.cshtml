@@ -4,33 +4,83 @@
     ViewData["Title"] = "User Profile";
 }
 
-<h2>User Profile</h2>
-<div class="row">
-    <div class="col-md-4">
-        <img src="/images/default-user.png" alt="Profile Image" class="img-thumbnail" width="200" height="200" />
+<h2 class="mb-5 text-center">User Profile</h2>
+
+<div class="row justify-content-center align-items-center gx-4">
+    <div class="col-12 col-md-4 text-center">
+        @if (Model.Profile.ImageBytes != null && Model.Profile.ImageBytes.Length > 0)
+        {
+            <a href="#" data-bs-toggle="modal" data-bs-target="#profileImageModal" class="d-inline-block mb-3" style="cursor:pointer;">
+                <img src="data:image/png;base64,@Convert.ToBase64String(Model.Profile.ImageBytes)"
+                     alt="Profile Image"
+                     class="img-thumbnail rounded-circle"
+                     style="width: 200px; height: 200px; object-fit: cover;" />
+            </a>
+        }
+        else
+        {
+            <a href="#" data-bs-toggle="modal" data-bs-target="#profileImageModal" class="d-inline-block mb-3" style="cursor:pointer;">
+                <img src="/images/default-user.png"
+                     alt="Default Profile Image"
+                     class="img-thumbnail rounded-circle"
+                     style="width: 200px; height: 200px; object-fit: cover;" />
+            </a>
+        }
+
+        <form method="post" enctype="multipart/form-data" asp-page-handler="ChangeImage" class="mt-4">
+            <label for="ProfileImage" class="form-label fw-semibold mb-2">Change Profile Image</label>
+            <input type="file" name="ProfileImage" id="ProfileImage" accept="image/*" class="form-control mb-3" />
+            <button type="submit" class="btn btn-primary w-100">Upload Image</button>
+        </form>
     </div>
-    <div class="col-md-8">
-        <dl class="row">
-            <dt class="col-sm-3">Username</dt>
-            <dd class="col-sm-9">@Model.Profile.Username</dd>
 
-            <dt class="col-sm-3">Email</dt>
-            <dd class="col-sm-9">@Model.Profile.Email</dd>
+    <div class="col-12 col-md-6">
+        <dl class="row fs-5">
+            <dt class="col-5 col-sm-4 fw-semibold">Username</dt>
+            <dd class="col-7 col-sm-8">@Model.Profile.Username</dd>
 
-            <dt class="col-sm-3">Age</dt>
-            <dd class="col-sm-9">@Model.Profile.Age</dd>
+            <dt class="col-5 col-sm-4 fw-semibold">Email</dt>
+            <dd class="col-7 col-sm-8">@Model.Profile.Email</dd>
 
-            <dt class="col-sm-3">Gender</dt>
-            <dd class="col-sm-9">@Model.Profile.Gender</dd>
+            <dt class="col-5 col-sm-4 fw-semibold">Age</dt>
+            <dd class="col-7 col-sm-8">@Model.Profile.Age</dd>
+
+            <dt class="col-5 col-sm-4 fw-semibold">Gender</dt>
+            <dd class="col-7 col-sm-8">@Model.Profile.Gender</dd>
         </dl>
 
-        <form method="post" asp-page-handler="Logout">
-            <button type="submit" class="btn btn-warning">Logout</button>
-        </form>
+        <div class="d-flex gap-3 flex-wrap mt-4">
+            <form method="post" asp-page-handler="Logout" class="flex-grow-1">
+                <button type="submit" class="btn btn-warning w-100">Logout</button>
+            </form>
 
-        <form method="post" asp-page-handler="Delete" onsubmit="return confirm('Are you sure you want to delete your account?');">
-            <button type="submit" class="btn btn-danger">Delete Account</button>
-        </form>
+            <form method="post" asp-page-handler="Delete" onsubmit="return confirm('Are you sure you want to delete your account?');" class="flex-grow-1">
+                <button type="submit" class="btn btn-danger w-100">Delete Account</button>
+            </form>
+        </div>
+    </div>
+</div>
 
+<div class="modal fade" id="profileImageModal" tabindex="-1" aria-labelledby="profileImageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content bg-transparent border-0">
+            <div class="modal-body p-0 text-center">
+                @if (Model.Profile.ImageBytes != null && Model.Profile.ImageBytes.Length > 0)
+                {
+                    <img src="data:image/png;base64,@Convert.ToBase64String(Model.Profile.ImageBytes)"
+                         alt="Profile Image Large"
+                         class="img-fluid rounded" />
+                }
+                else
+                {
+                    <img src="/images/default-user.png"
+                         alt="Default Profile Image Large"
+                         class="img-fluid rounded" />
+                }
+            </div>
+            <div class="modal-footer border-0 justify-content-center">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
     </div>
 </div>

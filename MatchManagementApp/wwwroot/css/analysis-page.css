@@ -1,0 +1,64 @@
+﻿.container {
+    max-width: 900px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #222;
+}
+
+h4, h5 {
+    font-weight: 600;
+    color: #111;
+}
+
+hr {
+    border-top: 1px solid #ddd;
+}
+
+.card {
+    border-radius: 10px;
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+    .card:hover {
+        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+        transform: translateY(-4px);
+    }
+
+.card-header {
+    font-weight: 700;
+    font-size: 1.15rem;
+    border-radius: 10px 10px 0 0;
+}
+
+.card-body p {
+    font-size: 1rem;
+    margin: 0.3rem 0;
+    color: #444;
+}
+
+@media (max-width: 768px) {
+    .card-body p {
+        font-size: 0.9rem;
+    }
+
+    .card-header {
+        font-size: 1rem;
+    }
+
+    h4 {
+        font-size: 1.3rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .container {
+        padding: 0 15px;
+    }
+
+    .card-body p {
+        font-size: 0.85rem;
+    }
+
+    h4, h5 {
+        font-size: 1.1rem;
+    }
+}

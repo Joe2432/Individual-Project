@@ -4,7 +4,11 @@
     ViewData["Title"] = "Login";
 }
 
-<div class="container mt-5" style="max-width: 500px;">
+@section Styles {
+    <link rel="stylesheet" href="~/css/login.css" />
+}
+
+<div class="container mt-5 mx-auto" style="max-width: 400px;">
     <h2 class="text-center mb-4">Welcome Back</h2>
 
     @if (!string.IsNullOrEmpty(Model.ErrorMessage))
@@ -12,7 +16,7 @@
         <div class="alert alert-danger">@Model.ErrorMessage</div>
     }
 
-    <form method="post">
+    <form method="post" novalidate>
         <div class="mb-3">
             <label asp-for="Input.Username" class="form-label">Username</label>
             <input asp-for="Input.Username" class="form-control" />
@@ -26,7 +30,7 @@
         </div>
 
         <div class="d-grid">
-            <button type="submit" class="btn btn-primary">Login</button>
+            <button type="submit" class="btn btn-primary btn-lg">Login</button>
         </div>
 
         <div class="text-center mt-3">

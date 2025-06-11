@@ -4,12 +4,16 @@
     ViewData["Title"] = "Play Match";
 }
 
+@section Styles {
+    <link rel="stylesheet" href="~/css/play-match.css" />
+}
+
 <h2 class="text-center mt-3 mb-4">Live Match Scoring</h2>
 
 @if (Model.MatchViewModel?.Score != null)
 {
-    <div class="scoreboard mb-4">
-        <table class="table table-bordered text-center">
+    <div class="scoreboard mb-4 table-responsive">
+        <table class="table table-bordered text-center align-middle">
             <thead>
                 <tr>
                     <th></th>
@@ -76,8 +80,21 @@ else if (Model.MatchViewModel != null)
         </span>
     </div>
 
+    <!-- Single centered Shot button -->
+    <div class="text-center mb-4">
+        <form method="post" class="d-inline-block">
+            <input type="hidden" asp-for="Point.MatchId" />
+            <input type="hidden" name="Point.IsUserWinner" value="@(Model.MatchViewModel.CurrentServer == "User" ? "true" : "false")" />
+            <input type="hidden" name="Point.IsFirstServe" value="@Model.Point.IsFirstServe.ToString().ToLower()" />
+            <input type="hidden" asp-for="Point.NumberOfShots" />
+            <button type="submit" name="IncrementShot" class="btn btn-secondary btn-lg px-4">
+                Shot (@Model.Point.NumberOfShots)
+            </button>
+        </form>
+    </div>
+
     <div class="row mb-4">
-        <div class="col text-center">
+        <div class="col-12 col-md-6 text-center">
             <h5>@(Model.MatchViewModel.CurrentServer == "User" ? "You (Server)" : "You (Receiver)")</h5>
             <form method="post">
                 <input type="hidden" asp-for="Point.MatchId" />
@@ -85,9 +102,7 @@ else if (Model.MatchViewModel != null)
                 <input type="hidden" name="Point.IsFirstServe" value="@Model.Point.IsFirstServe.ToString().ToLower()" />
                 <input type="hidden" asp-for="Point.NumberOfShots" />
 
-                <button type="submit" name="IncrementShot" class="btn btn-secondary m-1">
-                    Shot (@Model.Point.NumberOfShots)
-                </button>
+                @* Removed Shot button from here *@
 
                 @if (Model.MatchViewModel.CurrentServer == "User")
                 {
@@ -105,14 +120,14 @@ else if (Model.MatchViewModel != null)
                             @(Model.Point.NumberOfShots >= 1 ? "disabled" : "")>
                         Fault
                     </button>
-
                 }
                 <button type="submit" name="Point.PointType" value="Winner" class="btn btn-primary m-1">Winner</button>
                 <button type="submit" name="Point.PointType" value="Unforced Error" class="btn btn-secondary m-1">Unforced Error</button>
                 <button type="submit" name="Point.PointType" value="Forced Error" class="btn btn-secondary m-1">Forced Error</button>
             </form>
         </div>
-        <div class="col text-center">
+
+        <div class="col-12 col-md-6 text-center">
             <h5>@(Model.MatchViewModel.CurrentServer == "Opponent" ? "Opponent (Server)" : "Opponent (Receiver)")</h5>
             <form method="post">
                 <input type="hidden" asp-for="Point.MatchId" />
@@ -120,9 +135,7 @@ else if (Model.MatchViewModel != null)
                 <input type="hidden" name="Point.IsFirstServe" value="@Model.Point.IsFirstServe.ToString().ToLower()" />
                 <input type="hidden" asp-for="Point.NumberOfShots" />
 
-                <button type="submit" name="IncrementShot" class="btn btn-secondary m-1">
-                    Shot (@Model.Point.NumberOfShots)
-                </button>
+                @* Removed Shot button from here *@
 
                 @if (Model.MatchViewModel.CurrentServer == "Opponent")
                 {
@@ -140,11 +153,10 @@ else if (Model.MatchViewModel != null)
                             @(Model.Point.NumberOfShots >= 1 ? "disabled" : "")>
                         Fault
                     </button>
-
                 }
-                <button type="submit" name="Point.PointType" value="Winner" class="btn btn-danger m-1">Winner</button>
-                <button type="submit" name="Point.PointType" value="Unforced Error" class="btn btn-danger m-1">Unforced Error</button>
-                <button type="submit" name="Point.PointType" value="Forced Error" class="btn btn-danger m-1">Forced Error</button>
+                <button type="submit" name="Point.PointType" value="Winner" class="btn btn-primary m-1">Winner</button>
+                <button type="submit" name="Point.PointType" value="Unforced Error" class="btn btn-secondary m-1">Unforced Error</button>
+                <button type="submit" name="Point.PointType" value="Forced Error" class="btn btn-secondary m-1">Forced Error</button>
             </form>
         </div>
     </div>

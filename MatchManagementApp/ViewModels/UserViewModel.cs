@@ -21,4 +21,5 @@ public class UserViewModel
 
     [Required]
     public string Gender { get; set; } = string.Empty;
+    public byte[]? ImageBytes { get; set; }
 }

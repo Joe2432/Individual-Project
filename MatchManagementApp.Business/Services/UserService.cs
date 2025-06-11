@@ -101,6 +101,12 @@ public class UserService : IUserService
         };
     }
 
+    public async Task UpdateUserImageAsync(int userId, byte[] imageData)
+    {
+        await _userRepository.UpdateUserImageAsync(userId, imageData);
+    }
+
+
     public Task<UserDto?> GetUserByIdAsync(int userId)
         => _userRepository.GetUserByIdAsync(userId);
 }

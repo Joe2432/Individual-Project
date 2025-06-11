@@ -5,20 +5,11 @@
     ViewData["Title"] = "Match Analysis";
 }
 
+@section Styles {
+    <link rel="stylesheet" href="~/css/analysis-page.css" />
+}
+
 <div class="container mt-4">
-
-    <!-- Header Section -->
-    <div class="row mb-3 align-items-center">
-        <div class="col-12 col-md-6 mb-2 mb-md-0">
-            <h5>Hello, @User.Identity.Name!</h5>
-        </div>
-        <div class="col-12 col-md-6 text-md-end">
-            <h5>Opponent: @Model.ViewModel.PlayerAName</h5>
-        </div>
-    </div>
-
-    <hr />
-
     <!-- Match Info -->
     <div class="mb-4">
         <h4>Match Date: @Model.ViewModel.MatchDate?.ToString("dd MMM yyyy")</h4>

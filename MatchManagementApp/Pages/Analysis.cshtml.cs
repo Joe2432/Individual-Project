@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Threading.Tasks;
 
 namespace MatchManagementApp.UI.Pages
 {
@@ -20,6 +21,8 @@ namespace MatchManagementApp.UI.Pages
 
         public async Task<IActionResult> OnGetAsync(int id)
         {
+            await SetProfileImageAsync();
+
             var userId = await _userService.GetCurrentUserIdAsync(User);
             if (userId == null)
                 return RedirectToPage("/Account/Login");
@@ -30,6 +33,22 @@ namespace MatchManagementApp.UI.Pages
                 return NotFound();
 
             return Page();
+        }
+
+        private async Task SetProfileImageAsync()
+        {
+            var userId = await _userService.GetCurrentUserIdAsync(User);
+            if (userId != null)
+            {
+                var user = await _userService.GetUserByIdAsync(userId.Value);
+                if (user?.ImageBytes != null && user.ImageBytes.Length > 0)
+                {
+                    var base64 = Convert.ToBase64String(user.ImageBytes);
+                    ViewData["ProfileImageBase64"] = $"data:image/png;base64,{base64}";
+                    return;
+                }
+            }
+            ViewData["ProfileImageBase64"] = "/images/default-user.png";
         }
     }
 }

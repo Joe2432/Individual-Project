@@ -1,6 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MatchManagementApp.UI.Pages;
 
@@ -33,6 +37,18 @@ public class MatchHistoryModel : PageModel
         var userId = await _userService.GetCurrentUserIdAsync(User);
         if (userId == null)
             return;
+
+        // Set profile image base64 for layout navbar
+        var user = await _userService.GetUserByIdAsync(userId.Value);
+        if (user?.ImageBytes != null && user.ImageBytes.Length > 0)
+        {
+            var base64 = Convert.ToBase64String(user.ImageBytes);
+            ViewData["ProfileImageBase64"] = $"data:image/png;base64,{base64}";
+        }
+        else
+        {
+            ViewData["ProfileImageBase64"] = "/images/default-user.png";
+        }
 
         var dtos = await _matchService.GetMatchHistorySummariesAsync(
             userId.Value,

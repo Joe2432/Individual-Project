@@ -1,0 +1,62 @@
+﻿.container {
+    max-width: 900px;
+}
+
+h2 {
+    font-weight: 700;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #222;
+}
+
+.card {
+    border-radius: 10px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+    }
+
+.card-body {
+    padding: 1.8rem 1.5rem;
+}
+
+.card-title {
+    font-weight: 600;
+    font-size: 1.25rem;
+    color: #111;
+}
+
+.card-text {
+    font-size: 1rem;
+    color: #444;
+    margin-bottom: 1.5rem;
+}
+
+a.btn {
+    padding: 0.55rem 1.6rem;
+    font-weight: 600;
+    font-size: 1rem;
+    border-radius: 5px;
+    box-shadow: none;
+}
+@media (max-width: 576px) {
+    h2 {
+        font-size: 1.5rem;
+    }
+
+    .card-title {
+        font-size: 1.1rem;
+    }
+
+    .card-text {
+        font-size: 0.9rem;
+    }
+
+    a.btn {
+        width: 100%;
+        padding: 0.7rem 0;
+        font-size: 1.1rem;
+    }
+}

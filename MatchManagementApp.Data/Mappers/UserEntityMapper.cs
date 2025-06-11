@@ -9,19 +9,23 @@
             Email = entity.Email,
             PasswordHash = entity.PasswordHash,
             Age = entity.Age,
-            Gender = entity.Gender
+            Gender = entity.Gender,
+            ImageBytes = entity.ImageBytes
         };
     }
+
 
     public static UserEntity ToEntity(this UserDto dto, string hashedPassword)
     {
         return new UserEntity(
-            dto.Username,
-            dto.Email,
-            hashedPassword,
-            dto.Age,
-            dto.Gender,
-            "/images/default-user.png"
-        );
+        dto.Username,
+        dto.Email,
+        hashedPassword,
+        dto.Age,
+        dto.Gender,
+        null,
+        "/images/default-user.png"
+);
+
     }
 }

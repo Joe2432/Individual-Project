@@ -26,6 +26,9 @@ public class UserEntityConfiguration : IEntityTypeConfiguration<UserEntity>
 
         builder.Property(u => u.ImageUrl)
             .HasDefaultValueSql("'/images/default-user.png'");
-
+        builder.Property(u => u.ImageBytes)
+            .HasColumnType("varbinary(max)")
+            .IsRequired(false);
     }
+
 }

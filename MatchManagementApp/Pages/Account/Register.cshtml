@@ -4,7 +4,11 @@
     ViewData["Title"] = "Register";
 }
 
-<div class="container mt-5" style="max-width: 600px;">
+@section Styles {
+    <link rel="stylesheet" href="~/css/register.css" />
+}
+
+<div class="container mt-5 mx-auto" style="max-width: 500px;">
     <h2 class="text-center mb-4">Create a New Account</h2>
 
     <form method="post" novalidate>
@@ -49,7 +53,7 @@
         </div>
 
         <div class="d-grid">
-            <button type="submit" class="btn btn-success">Register</button>
+            <button type="submit" class="btn btn-success btn-lg">Register</button>
         </div>
 
         <div class="text-center mt-3">

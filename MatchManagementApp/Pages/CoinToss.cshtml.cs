@@ -1,23 +1,27 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Threading.Tasks;
 
 namespace MatchManagementApp.UI.Pages
 {
     public class CoinTossModel : PageModel
     {
         private readonly IMatchService _matchService;
+        private readonly IUserService _userService;
 
-        public CoinTossModel(IMatchService matchService)
-        {
-            _matchService = matchService;
-        }
-
-        [BindProperty]
         public MatchDto PendingMatch { get; set; } = default!;
 
-        public IActionResult OnGet()
+        public CoinTossModel(IMatchService matchService, IUserService userService)
         {
+            _matchService = matchService;
+            _userService = userService;
+        }
+
+        public async Task<IActionResult> OnGetAsync()
+        {
+            await SetProfileImageAsync();
+
             if (TempData.TryGetValue("PendingMatch", out var pendingJsonObj) &&
                 pendingJsonObj is string pendingJson)
             {
@@ -49,6 +53,22 @@ namespace MatchManagementApp.UI.Pages
             var newMatchId = await _matchService.CreateMatchAsync(dto);
 
             return RedirectToPage("/PlayMatch", new { id = newMatchId });
+        }
+
+        private async Task SetProfileImageAsync()
+        {
+            var userId = await _userService.GetCurrentUserIdAsync(User);
+            if (userId != null)
+            {
+                var user = await _userService.GetUserByIdAsync(userId.Value);
+                if (user?.ImageBytes != null && user.ImageBytes.Length > 0)
+                {
+                    var base64 = Convert.ToBase64String(user.ImageBytes);
+                    ViewData["ProfileImageBase64"] = $"data:image/png;base64,{base64}";
+                    return;
+                }
+            }
+            ViewData["ProfileImageBase64"] = "/images/default-user.png";
         }
     }
 }

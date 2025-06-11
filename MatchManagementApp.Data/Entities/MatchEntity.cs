@@ -17,9 +17,6 @@
 
     public UserEntity User { get; private set; } = null!;
     public ICollection<PointEntity> Points { get; private set; } = new List<PointEntity>();
-
-    private MatchEntity() { }
-
     public MatchEntity(
      int createdByUserId,
      string matchType,

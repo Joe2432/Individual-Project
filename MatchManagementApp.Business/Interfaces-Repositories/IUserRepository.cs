@@ -7,4 +7,5 @@ public interface IUserRepository
     Task<UserDto?> GetUserByIdAsync(int userId);
     Task<int> CreateUserAsync(UserDto dto);
     Task DeleteUserAsync(int userId);
+    Task UpdateUserImageAsync(int userId, byte[] imageData);
 }

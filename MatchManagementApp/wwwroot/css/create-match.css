@@ -1,0 +1,60 @@
+﻿.container {
+    max-width: 900px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #222;
+}
+
+.card {
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.card-header {
+    font-weight: 700;
+    font-size: 1.25rem;
+    border-radius: 10px 10px 0 0;
+}
+
+form label {
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.form-control, .form-select {
+    min-width: 180px;
+    max-width: 280px;
+}
+
+.btn-success {
+    font-weight: 700;
+    font-size: 1.1rem;
+    border-radius: 5px;
+    padding: 0.45rem 1.5rem;
+    transition: background-color 0.3s ease;
+}
+
+    .btn-success:hover {
+        background-color: #198754cc;
+    }
+
+@media (max-width: 576px) {
+    form {
+        flex-wrap: wrap !important;
+    }
+
+    .form-control, .form-select {
+        min-width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .col-auto {
+        width: 100% !important;
+        margin-bottom: 0.75rem;
+    }
+
+    .btn-success {
+        width: 100%;
+        padding: 0.75rem 0;
+        font-size: 1.2rem;
+    }
+}

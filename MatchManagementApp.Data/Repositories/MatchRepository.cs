@@ -1,6 +1,5 @@
-﻿// MatchRepository.cs
-using Microsoft.EntityFrameworkCore;
-using System.Linq; // for .Where(...)
+﻿using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 public class MatchRepository : IMatchRepository
 {

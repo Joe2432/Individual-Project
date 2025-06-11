@@ -33,6 +33,8 @@ namespace MatchManagementApp.UI.Pages
 
         public async Task<IActionResult> OnGetAsync(int id)
         {
+            await SetProfileImageAsync();
+
             var userId = await _userService.GetCurrentUserIdAsync(User);
             if (userId == null) return RedirectToPage("/Account/Login");
 
@@ -54,6 +56,8 @@ namespace MatchManagementApp.UI.Pages
 
         public async Task<IActionResult> OnPostAsync()
         {
+            await SetProfileImageAsync();
+
             var userId = await _userService.GetCurrentUserIdAsync(User);
             if (userId == null) return RedirectToPage("/Account/Login");
 
@@ -100,6 +104,22 @@ namespace MatchManagementApp.UI.Pages
 
             await _pointService.RegisterPointAsync(PointMapper.ToDto(Point), User);
             return RedirectToPage(new { id = Point.MatchId });
+        }
+
+        private async Task SetProfileImageAsync()
+        {
+            var userId = await _userService.GetCurrentUserIdAsync(User);
+            if (userId != null)
+            {
+                var user = await _userService.GetUserByIdAsync(userId.Value);
+                if (user?.ImageBytes != null && user.ImageBytes.Length > 0)
+                {
+                    var base64 = Convert.ToBase64String(user.ImageBytes);
+                    ViewData["ProfileImageBase64"] = $"data:image/png;base64,{base64}";
+                    return;
+                }
+            }
+            ViewData["ProfileImageBase64"] = "/images/default-user.png";
         }
     }
 }

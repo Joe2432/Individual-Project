@@ -1,4 +1,4 @@
-﻿public static class PointMapper
+﻿public static class PointEntityMapper
 {
     public static PointDto ToReadDto(this PointEntity entity)
     {

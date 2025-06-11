@@ -1,0 +1,47 @@
+﻿.text-center form.d-inline-block {
+    margin-bottom: 1rem;
+}
+
+    .text-center form.d-inline-block .btn {
+        min-width: 140px;
+        font-size: 1.2rem;
+        padding: 0.5rem 1.5rem;
+    }
+
+.btn {
+    min-width: 90px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 0.4rem 0.9rem;
+    transition: background-color 0.3s ease;
+}
+
+    .btn.m-1 {
+        margin: 0.25rem;
+    }
+
+    .btn:disabled, .btn[disabled] {
+        opacity: 0.65;
+        cursor: not-allowed;
+    }
+
+@media (max-width: 767.98px) {
+    .btn {
+        min-width: 70px;
+        font-size: 0.85rem;
+        padding: 0.35rem 0.7rem;
+    }
+
+    .current-game-status .badge {
+        font-size: 1rem;
+        padding: 0.4rem 0.8rem;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .btn {
+        width: 100%;
+        min-width: auto;
+        margin: 0.25rem 0 !important;
+    }
+}
