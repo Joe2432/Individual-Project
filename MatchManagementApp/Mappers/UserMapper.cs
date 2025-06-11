@@ -1,6 +1,6 @@
 ﻿    public static class UserMapper
     {
-        public static UserDto ToCreateDto(UserRegistrationViewModel vm)
+        public static UserDto ToCreateDto(UserViewModel vm)
         {
             return new UserDto
             {
@@ -12,9 +12,9 @@
             };
         }
 
-        public static UserRegistrationViewModel ToRegistrationViewModel(UserDto dto)
+        public static UserViewModel ToUserViewModel(UserDto dto)
         {
-            return new UserRegistrationViewModel
+            return new UserViewModel
             {
                 Username = dto.Username,
                 Email = dto.Email,

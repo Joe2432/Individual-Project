@@ -17,7 +17,7 @@ namespace MatchManagementApp.UI.Pages.Account
             _userService = userService;
         }
 
-        public UserRegistrationViewModel Profile { get; set; } = new();
+        public UserViewModel Profile { get; set; } = new();
 
         public async Task<IActionResult> OnGetAsync()
         {

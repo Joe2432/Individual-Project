@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-public class UserRegistrationViewModel
+public class UserViewModel
 {
     [Required]
     public string Username { get; set; } = string.Empty;

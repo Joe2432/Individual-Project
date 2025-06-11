@@ -15,7 +15,7 @@ namespace MatchManagementApp.UI.Pages.Account
         }
 
         [BindProperty]
-        public UserRegistrationViewModel UserRegistration { get; set; } = new();
+        public UserViewModel UserRegistration { get; set; } = new();
 
         public string? ErrorMessage { get; set; }
 

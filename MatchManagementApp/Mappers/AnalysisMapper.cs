@@ -49,12 +49,8 @@
             ServiceGamesWonA = dto.ServiceGamesWonA,
             ServiceGamesWonB = dto.ServiceGamesWonB,
 
-            TotalShotsPlayerA = dto.TotalShotsPlayerA,
-            TotalShotsPlayerB = dto.TotalShotsPlayerB,
-            AvgShotsPerPointA = dto.AvgShotsPerPointA,
-            AvgShotsPerPointB = dto.AvgShotsPerPointB,
-            MaxShotsInPointA = dto.MaxShotsInPointA,
-            MaxShotsInPointB = dto.MaxShotsInPointB
+            AvgShotsPerPoint = dto.AvgShotsPerPoint,
+            MaxShotsInPoint = dto.MaxShotsInPoint,
         };
     }
 }

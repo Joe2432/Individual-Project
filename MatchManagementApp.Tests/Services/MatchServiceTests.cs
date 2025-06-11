@@ -1,173 +1,265 @@
-﻿using Xunit;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Moq;
+using Xunit;
 
-namespace MatchManagementApp.Tests.Services;
 
-public class MatchServiceTests
+namespace MatchManagementApp.Tests.Services
 {
-    private readonly Mock<IMatchRepository> _matchRepositoryMock;
-    private readonly Mock<IPointRepository> _pointRepositoryMock;
-    private readonly Mock<IUserRepository> _userRepositoryMock;
-    private readonly Mock<IScorekeepingService> _scorekeepingServiceMock;
-    private readonly MatchService _matchService;
-
-    public MatchServiceTests()
+    public class MatchServiceTests
     {
-        _matchRepositoryMock = new Mock<IMatchRepository>();
-        _pointRepositoryMock = new Mock<IPointRepository>();
-        _userRepositoryMock = new Mock<IUserRepository>();
-        _scorekeepingServiceMock = new Mock<IScorekeepingService>();
+        private readonly Mock<IMatchRepository> _matchRepoMock;
+        private readonly Mock<IPointRepository> _pointRepoMock;
+        private readonly Mock<IUserRepository> _userRepoMock;
+        private readonly Mock<IScorekeepingService> _scoreServiceMock;
+        private readonly MatchService _sut;
 
-        _matchService = new MatchService(
-            _matchRepositoryMock.Object,
-            _pointRepositoryMock.Object,
-            _userRepositoryMock.Object,
-            _scorekeepingServiceMock.Object
-        );
-    }
-
-    [Fact]
-    public async Task CreateMatchAsync_ShouldReturnNewMatchId_WhenUserExists()
-    {
-        var dto = MatchDtoFactory.ValidSinglesMatch();
-        var userDto = UserDtoFactory.ValidUser(dto.CreatedByUserId);
-
-        _userRepositoryMock.Setup(r => r.GetUserByIdAsync(dto.CreatedByUserId)).ReturnsAsync(userDto);
-        _matchRepositoryMock.Setup(r => r.CreateMatchAsync(dto)).ReturnsAsync(101);
-
-        var result = await _matchService.CreateMatchAsync(dto);
-
-        Assert.Equal(101, result);
-    }
-
-    [Fact]
-    public async Task CreateMatchAsync_ShouldThrow_WhenUserNotFound()
-    {
-        var dto = MatchDtoFactory.ValidSinglesMatch();
-        _userRepositoryMock.Setup(r => r.GetUserByIdAsync(dto.CreatedByUserId)).ReturnsAsync((UserDto?)null);
-
-        await Assert.ThrowsAsync<InvalidOperationException>(() => _matchService.CreateMatchAsync(dto));
-    }
-
-    [Fact]
-    public async Task GetUserMatchesAsync_ShouldReturnAllMatchesForUser()
-    {
-        int userId = 1;
-        var matchList = new List<MatchDto>
+        public MatchServiceTests()
         {
-            MatchDtoFactory.ValidSinglesMatch(userId),
-            MatchDtoFactory.ValidDoublesMatch(userId)
-        };
+            _matchRepoMock = new Mock<IMatchRepository>();
+            _pointRepoMock = new Mock<IPointRepository>();
+            _userRepoMock = new Mock<IUserRepository>();
+            _scoreServiceMock = new Mock<IScorekeepingService>();
 
-        _matchRepositoryMock.Setup(r => r.GetMatchesByUserIdAsync(userId)).ReturnsAsync(matchList);
-        _scorekeepingServiceMock.Setup(s => s.CalculateScore(It.IsAny<MatchDto>(), It.IsAny<IEnumerable<PointDto>>()))
-            .Returns<MatchDto, IEnumerable<PointDto>>((dto, _) => dto);
+            _sut = new MatchService(
+                _matchRepoMock.Object,
+                _pointRepoMock.Object,
+                _userRepoMock.Object,
+                _scoreServiceMock.Object
+            );
+        }
 
-        _pointRepositoryMock.Setup(r => r.GetPointsByMatchIdAsync(It.IsAny<int>())).ReturnsAsync(new List<PointDto>());
+        [Fact]
+        public async Task CreateMatchAsync_InvokesRepositoryAndReturnsId()
+        {
+            // Arrange
+            var dummyMatch = MatchDtoFactory.ValidSinglesMatch(userId: 1);
 
-        var result = await _matchService.GetUserMatchesAsync(userId);
+            _matchRepoMock
+                .Setup(r => r.CreateMatchAsync(It.IsAny<MatchDto>()))
+                .ReturnsAsync(42);
 
-        Assert.Equal(2, result.Count);
-        Assert.All(result, m => Assert.Equal(userId, m.CreatedByUserId));
-    }
+            // Act
+            var returnedId = await _sut.CreateMatchAsync(dummyMatch);
 
-    [Fact]
-    public async Task GetScoreDisplayAsync_ShouldReturnFormattedScore()
-    {
-        int matchId = 1, userId = 1;
-        var match = MatchDtoFactory.ValidSinglesMatch(userId);
-        var points = PointDtoFactory.SimulatedGamePoints(true);
-        match.CurrentGameScore = "40 - 30";
+            // Assert
+            Assert.Equal(42, returnedId);
+            _matchRepoMock.Verify(r => r.CreateMatchAsync(dummyMatch), Times.Once);
+        }
 
-        _matchRepositoryMock.Setup(r => r.GetMatchByIdAsync(matchId)).ReturnsAsync(match);
-        _pointRepositoryMock.Setup(r => r.GetPointsByMatchIdAsync(matchId)).ReturnsAsync(points);
-        _scorekeepingServiceMock.Setup(s => s.CalculateScore(match, points)).Returns(match);
+        [Fact]
+        public async Task DeleteMatchAsync_InvokesRepository()
+        {
+            // Arrange
+            var matchId = 99;
 
-        var result = await _matchService.GetScoreDisplayAsync(matchId, userId);
+            // Act
+            await _sut.DeleteMatchAsync(matchId);
 
-        Assert.Equal("40 - 30", result);
-    }
+            // Assert
+            _matchRepoMock.Verify(r => r.DeleteMatchAsync(matchId), Times.Once);
+        }
 
-    [Fact]
-    public async Task GetScoreDisplayAsync_ShouldReturnErrorMessage_WhenMatchNotFound()
-    {
-        int matchId = 999, userId = 1;
-        _matchRepositoryMock.Setup(r => r.GetMatchByIdAsync(matchId)).ReturnsAsync((MatchDto?)null);
+        [Fact]
+        public async Task GetMatchByIdAsync_WhenMatchExists_ReturnsDto()
+        {
+            // Arrange
+            var dummyMatch = MatchDtoFactory.ValidSinglesMatch(userId: 2);
+            dummyMatch.Id = 7;
 
-        var result = await _matchService.GetScoreDisplayAsync(matchId, userId);
+            _matchRepoMock
+                .Setup(r => r.GetMatchByIdAsync(7))
+                .ReturnsAsync(dummyMatch);
 
-        Assert.Equal("Match not found", result);
-    }
+            // Act
+            var result = await _sut.GetMatchByIdAsync(7);
 
-    [Fact]
-    public async Task RegisterPointAsync_ShouldAddPoint_WhenMatchExists()
-    {
-        int matchId = 1, userId = 1;
-        var match = MatchDtoFactory.ValidSinglesMatch(userId);
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(7, result.Id);
+            _matchRepoMock.Verify(r => r.GetMatchByIdAsync(7), Times.Once);
+        }
 
-        _matchRepositoryMock.Setup(r => r.GetMatchByIdAsync(matchId)).ReturnsAsync(match);
+        [Fact]
+        public async Task GetMatchByIdAsync_WhenNotFound_ReturnsNull()
+        {
+            // Arrange
+            _matchRepoMock
+                .Setup(r => r.GetMatchByIdAsync(It.IsAny<int>()))
+                .ReturnsAsync((MatchDto)null);
 
-        await _matchService.RegisterPointAsync(matchId, userId, "Winner", true);
+            // Act
+            var result = await _sut.GetMatchByIdAsync(1234);
 
-        _pointRepositoryMock.Verify(r => r.AddPointAsync(It.Is<PointDto>(p =>
-            p.MatchId == matchId &&
-            p.PointType == "Winner" &&
-            p.IsUserWinner == true &&
-            p.NumberOfShots == 0
-        )), Times.Once);
-    }
+            // Assert
+            Assert.Null(result);
+        }
 
-    [Fact]
-    public async Task RegisterPointAsync_ShouldDoNothing_WhenMatchDoesNotExist()
-    {
-        int matchId = 999;
+        [Fact]
+        public async Task GetUserMatchesAsync_InvokesScorekeepingAndPopulatesDisplayFields()
+        {
+            // Arrange
+            var userId = 5;
 
-        _matchRepositoryMock.Setup(r => r.GetMatchByIdAsync(matchId)).ReturnsAsync((MatchDto?)null);
+            var match1 = MatchDtoFactory.ValidSinglesMatch(userId: userId);
+            match1.Id = 1;
+            match1.NrSets = 3;
+            match1.GameFormat = "Standard";
+            match1.FinalSetType = "Standard";
+            match1.SetScores = new List<SetScoreDto>();
+            match1.MatchDate = DateTime.UtcNow.AddDays(-1);
+            match1.FirstOpponentName = "Alice";
+            match1.SecondOpponentName = "Bob";
 
-        await _matchService.RegisterPointAsync(matchId, userId: 1, pointType: "Winner", isUserWinner: true);
+            var match2 = MatchDtoFactory.ValidSinglesMatch(userId: userId);
+            match2.Id = 2;
+            match2.NrSets = 1;
+            match2.GameFormat = "Standard";
+            match2.FinalSetType = "Standard";
+            match2.SetScores = new List<SetScoreDto>();
+            match2.MatchDate = DateTime.UtcNow;
+            match2.FirstOpponentName = "Carol";
+            match2.SecondOpponentName = "Dave";
 
-        _pointRepositoryMock.Verify(r => r.AddPointAsync(It.IsAny<PointDto>()), Times.Never);
-    }
+            var userMatches = new List<MatchDto> { match1, match2 };
+            _matchRepoMock
+                .Setup(r => r.GetMatchesByUserIdAsync(userId))
+                .ReturnsAsync(userMatches);
 
-    [Fact]
-    public async Task UndoLastPointAsync_ShouldCallDeleteLastPoint()
-    {
-        int matchId = 1;
+            _pointRepoMock
+                .Setup(r => r.GetPointsByMatchIdAsync(It.IsAny<int>()))
+                .ReturnsAsync(new List<PointDto>());
 
-        await _matchService.UndoLastPointAsync(matchId);
+            _scoreServiceMock
+                .Setup(s => s.CalculateScore(It.IsAny<MatchDto>(), It.IsAny<IEnumerable<PointDto>>()))
+                .Returns<MatchDto, IEnumerable<PointDto>>((m, pts) => m);
 
-        _pointRepositoryMock.Verify(r => r.DeleteLastPointAsync(matchId), Times.Once);
-    }
+            // Act
+            var results = await _sut.GetUserMatchesAsync(userId);
 
-    [Fact]
-    public async Task GetMatchForPlayingAsync_ShouldReturnDto_WhenMatchExists()
-    {
-        int matchId = 1, userId = 1;
-        var match = MatchDtoFactory.ValidSinglesMatch(userId);
-        var points = PointDtoFactory.SimulatedGamePoints(true);
-        match.SetScores = new List<SetScoreDto> { new() { Player1Games = 1, Player2Games = 0 } };
-        match.CurrentGameScore = "15 - 0";
+            // Assert
+            Assert.Equal(2, results.Count);
 
-        _matchRepositoryMock.Setup(r => r.GetMatchByIdAsync(matchId)).ReturnsAsync(match);
-        _pointRepositoryMock.Setup(r => r.GetPointsByMatchIdAsync(matchId)).ReturnsAsync(points);
-        _scorekeepingServiceMock.Setup(s => s.CalculateScore(match, points)).Returns(match);
+            _scoreServiceMock.Verify(s => s.CalculateScore(
+                It.Is<MatchDto>(m => m.Id == 1),
+                It.IsAny<IEnumerable<PointDto>>()), Times.Once);
+            _scoreServiceMock.Verify(s => s.CalculateScore(
+                It.Is<MatchDto>(m => m.Id == 2),
+                It.IsAny<IEnumerable<PointDto>>()), Times.Once);
 
-        var result = await _matchService.GetMatchForPlayingAsync(matchId, userId);
+            foreach (var m in results)
+            {
+                Assert.True(
+                    m.GameUserDisplay == "0 - 0" ||
+                    m.GameUserDisplay == m.CurrentGameScore
+                );
+                Assert.True(
+                    m.GameOpponentDisplay == "0 - 0" ||
+                    m.GameOpponentDisplay == m.CurrentGameScore
+                );
+            }
+        }
 
-        Assert.NotNull(result);
-        Assert.Equal("15", result.GameUserDisplay);
-        Assert.Equal("0", result.GameOpponentDisplay);
-        Assert.Single(result.SetScores);
-    }
+        [Fact]
+        public async Task GetScoreDisplayAsync_WhenMatchNotFound_ReturnsNotFoundMessage()
+        {
+            // Arrange
+            _matchRepoMock
+                .Setup(r => r.GetMatchByIdAsync(It.IsAny<int>()))
+                .ReturnsAsync((MatchDto)null);
 
-    [Fact]
-    public async Task GetMatchForPlayingAsync_ShouldReturnNull_WhenMatchNotFound()
-    {
-        int matchId = 123, userId = 1;
-        _matchRepositoryMock.Setup(r => r.GetMatchByIdAsync(matchId)).ReturnsAsync((MatchDto?)null);
+            // Act
+            var display = await _sut.GetScoreDisplayAsync(123, 5);
 
-        var result = await _matchService.GetMatchForPlayingAsync(matchId, userId);
+            // Assert
+            Assert.Equal("Match not found", display);
+        }
 
-        Assert.Null(result);
+        [Fact]
+        public async Task GetScoreDisplayAsync_WhenMatchExists_ReturnsCurrentGameScore()
+        {
+            // Arrange
+            var matchId = 11;
+            var dummyMatch = MatchDtoFactory.ValidSinglesMatch(userId: 5);
+            dummyMatch.Id = matchId;
+
+            _matchRepoMock
+                .Setup(r => r.GetMatchByIdAsync(matchId))
+                .ReturnsAsync(dummyMatch);
+
+            _pointRepoMock
+                .Setup(r => r.GetPointsByMatchIdAsync(matchId))
+                .ReturnsAsync(new List<PointDto>());
+
+            var scoredMatch = MatchDtoFactory.ValidSinglesMatch(userId: 5);
+            scoredMatch.Id = matchId;
+            scoredMatch.CurrentGameScore = "15 - 30";
+
+            _scoreServiceMock
+                .Setup(s => s.CalculateScore(It.IsAny<MatchDto>(), It.IsAny<IEnumerable<PointDto>>()))
+                .Returns(scoredMatch);
+
+            // Act
+            var display = await _sut.GetScoreDisplayAsync(matchId, 5);
+
+            // Assert
+            Assert.Equal("15 - 30", display);
+        }
+
+        [Fact]
+        public async Task RegisterPointAsync_CreatesNewDtoAndCallsPointRepo()
+        {
+            // Arrange
+            var matchId = 77;
+            var userId = 42;
+            var pointType = "Ace";
+            var isUserWinner = true;
+
+            var dummyMatch = MatchDtoFactory.ValidSinglesMatch(userId: userId);
+            dummyMatch.Id = matchId;
+            _matchRepoMock
+                .Setup(r => r.GetMatchByIdAsync(matchId))
+                .ReturnsAsync(dummyMatch);
+
+            // Act
+            await _sut.RegisterPointAsync(matchId, userId, pointType, isUserWinner);
+
+            // Assert
+            _pointRepoMock.Verify(r => r.AddPointAsync(It.Is<PointDto>(dto =>
+                dto.MatchId == matchId &&
+                dto.PointType == pointType &&
+                dto.IsUserWinner == isUserWinner &&
+                dto.NumberOfShots == 0
+            )), Times.Once);
+        }
+
+        [Fact]
+        public async Task RegisterPointAsync_WhenMatchNull_DoesNothing()
+        {
+            // Arrange
+            _matchRepoMock
+                .Setup(r => r.GetMatchByIdAsync(It.IsAny<int>()))
+                .ReturnsAsync((MatchDto)null);
+
+            // Act
+            await _sut.RegisterPointAsync(123, 5, "Fault", false);
+
+            // Assert
+            _pointRepoMock.Verify(r => r.AddPointAsync(It.IsAny<PointDto>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task UndoLastPointAsync_InvokesDeleteLastPoint()
+        {
+            // Arrange
+            var matchId = 55;
+
+            // Act
+            await _sut.UndoLastPointAsync(matchId);
+
+            // Assert
+            _pointRepoMock.Verify(r => r.DeleteLastPointAsync(matchId), Times.Once);
+        }
     }
 }

@@ -44,12 +44,7 @@
     public int ServicePointsWonB { get; set; }
     public int ServiceGamesWonA { get; set; }
     public int ServiceGamesWonB { get; set; }
+    public double AvgShotsPerPoint { get; set; }
+    public int MaxShotsInPoint { get; set; }
 
-    // Shot-related metrics
-    public int TotalShotsPlayerA { get; set; }
-    public int TotalShotsPlayerB { get; set; }
-    public double AvgShotsPerPointA { get; set; }
-    public double AvgShotsPerPointB { get; set; }
-    public int MaxShotsInPointA { get; set; }
-    public int MaxShotsInPointB { get; set; }
 }

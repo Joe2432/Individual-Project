@@ -121,12 +121,12 @@
         var serviceGamesA = matchDto.SetScores.Sum(s => s.Player1Games);
         var serviceGamesB = matchDto.SetScores.Sum(s => s.Player2Games);
 
-        var totalShotsA = pointDtos
-            .Where(p => p.IsUserWinner)
-            .Sum(p => p.NumberOfShots);
-        var totalShotsB = pointDtos
-            .Where(p => !p.IsUserWinner)
-            .Sum(p => p.NumberOfShots);
+        var totalShotsA = pointDtos.Where(p => p.IsUserWinner).Sum(p => p.NumberOfShots);
+        var totalShotsB = pointDtos.Where(p => !p.IsUserWinner).Sum(p => p.NumberOfShots);
+        var totalShots = totalShotsA + totalShotsB;
+        var totalPoints = pointsWonA + pointsWonB;
+        var avgShots = totalPoints > 0 ? Math.Round((double)totalShots / totalPoints, 1) : 0;
+        var maxShots = pointDtos.Select(p => p.NumberOfShots).DefaultIfEmpty(0).Max();
 
         var avgShotsA = pointsWonA > 0
             ? Math.Round((double)totalShotsA / pointsWonA, 1)
@@ -204,13 +204,8 @@
             ServicePointsWonB = servicePointsWonB,
             ServiceGamesWonA = serviceGamesA,
             ServiceGamesWonB = serviceGamesB,
-
-            TotalShotsPlayerA = totalShotsA,
-            TotalShotsPlayerB = totalShotsB,
-            AvgShotsPerPointA = avgShotsA,
-            AvgShotsPerPointB = avgShotsB,
-            MaxShotsInPointA = maxShotsA,
-            MaxShotsInPointB = maxShotsB
+            AvgShotsPerPoint = avgShots,
+            MaxShotsInPoint = maxShots
         };
     }
 }

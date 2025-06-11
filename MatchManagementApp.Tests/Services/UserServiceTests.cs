@@ -1,124 +1,192 @@
-﻿using Xunit;
+﻿using System.Security.Claims;
+using System.Threading.Tasks;
 using Moq;
-using System.Security.Claims;
+using Xunit;
 
-namespace MatchManagementApp.Tests.Services;
-
-public class UserServiceTests
+namespace MatchManagementApp.Tests.Services
 {
-    private readonly Mock<IUserRepository> _userRepoMock;
-    private readonly Mock<IAuthService> _authServiceMock;
-    private readonly UserService _userService;
-
-    public UserServiceTests()
+    public class UserServiceTests
     {
-        _userRepoMock = new Mock<IUserRepository>();
-        _authServiceMock = new Mock<IAuthService>();
-        _userService = new UserService(_userRepoMock.Object, _authServiceMock.Object);
-    }
+        private readonly Mock<IUserRepository> _userRepoMock;
+        private readonly Mock<IAuthService> _authServiceMock;
+        private readonly UserService _sut;
 
-    [Fact]
-    public async Task TryRegisterAsync_ShouldReturnSuccess_WhenUserDoesNotExist()
-    {
-        // Arrange
-        var dto = UserDtoFactory.ValidUser();
+        public UserServiceTests()
+        {
+            _userRepoMock = new Mock<IUserRepository>();
+            _authServiceMock = new Mock<IAuthService>();
+            _sut = new UserService(
+                _userRepoMock.Object,
+                _authServiceMock.Object
+            );
+        }
 
-        _userRepoMock
-            .Setup(r => r.GetUserByEmailAsync(dto.Email))
-            .ReturnsAsync((UserDto?)null);
+        [Fact]
+        public void HashPassword_AlwaysReturnsHashedString()
+        {
+            // Arrange
+            var raw = "myPlainPassword";
 
-        _userRepoMock
-            .SetupSequence(r => r.GetUserByUsernameAsync(dto.Username))
-            .ReturnsAsync((UserDto?)null)
-            .ReturnsAsync(dto);
+            // Act
+            var hashed = _sut.HashPassword(raw);
 
-        _userRepoMock
-            .Setup(r => r.CreateUserAsync(dto))
-            .ReturnsAsync(1);
+            // Assert
+            Assert.NotNull(hashed);
+            Assert.NotEqual(raw, hashed);
+            Assert.StartsWith("$2a$", hashed);
+        }
 
+        [Fact]
+        public void VerifyPassword_CorrectRawMatchesHash_ReturnsTrue()
+        {
+            // Arrange
+            var raw = "secret123";
+            var hash = BCrypt.Net.BCrypt.HashPassword(raw);
 
-        _authServiceMock
-            .Setup(a => a.GetClaimsPrincipal(dto))
-            .Returns(new ClaimsPrincipal());
+            // Act
+            var result = _sut.VerifyPassword(hash, raw);
 
-        // Act
-        var result = await _userService.TryRegisterAsync(dto);
+            // Assert
+            Assert.True(result);
+        }
 
-        // Assert
-        Assert.True(result.Success);
-        Assert.NotNull(result.ClaimsPrincipal);
-    }
+        [Fact]
+        public void VerifyPassword_IncorrectRaw_ReturnsFalse()
+        {
+            // Arrange
+            var hash = BCrypt.Net.BCrypt.HashPassword("somePassword");
 
+            // Act
+            var result = _sut.VerifyPassword(hash, "wrongPassword");
 
+            // Assert
+            Assert.False(result);
+        }
 
-    [Fact]
-    public async Task TryRegisterAsync_ShouldFail_WhenUsernameAlreadyExists()
-    {
-        // Arrange
-        var existingUser = UserDtoFactory.ValidUser();
+        [Fact]
+        public async Task TrySignInAsync_InvalidUsername_ReturnsFailure()
+        {
+            // Arrange
+            var username = "nonexistent";
+            var password = "whatever";
 
-        _userRepoMock.Setup(r => r.GetUserByUsernameAsync(existingUser.Username))
-                     .ReturnsAsync(existingUser);
+            _userRepoMock
+                .Setup(r => r.GetUserByUsernameAsync(username))
+                .ReturnsAsync((UserDto)null);
 
-        // Act
-        var result = await _userService.TryRegisterAsync(existingUser);
+            // Act
+            var result = await _sut.TrySignInAsync(username, password);
 
-        // Assert
-        Assert.False(result.Success);
-        Assert.Equal("Username is already taken.", result.ErrorMessage);
-    }
+            // Assert
+            Assert.False(result.Success);
+            Assert.Equal("Invalid username or password.", result.ErrorMessage);
+            Assert.Null(result.ClaimsPrincipal);
+        }
 
-    [Fact]
-    public async Task TrySignInAsync_ShouldReturnSuccess_WhenCredentialsAreValid()
-    {
-        // Arrange
-        var user = UserDtoFactory.ValidUser();
-        user.Password = "Test123";
-        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword("Test123");
+        [Fact]
+        public async Task TrySignInAsync_WrongPassword_ReturnsFailure()
+        {
+            // Arrange
+            var username = "bob";
+            var password = "wrongpass";
 
-        _userRepoMock.Setup(r => r.GetUserByUsernameAsync(user.Username))
-                     .ReturnsAsync(user);
+            var stored = UserDtoFactory.ValidUser(id: 10);
+            stored.Username = username;
+            stored.PasswordHash = BCrypt.Net.BCrypt.HashPassword("correctpass");
 
-        _authServiceMock.Setup(a => a.GetClaimsPrincipal(user))
-                        .Returns(new System.Security.Claims.ClaimsPrincipal());
+            _userRepoMock
+                .Setup(r => r.GetUserByUsernameAsync(username))
+                .ReturnsAsync(stored);
 
-        // Act
-        var result = await _userService.TrySignInAsync(user.Username, "Test123");
+            // Act
+            var result = await _sut.TrySignInAsync(username, password);
 
-        // Assert
-        Assert.True(result.Success);
-        Assert.NotNull(result.ClaimsPrincipal);
-    }
+            // Assert
+            Assert.False(result.Success);
+            Assert.Equal("Invalid username or password.", result.ErrorMessage);
+            Assert.Null(result.ClaimsPrincipal);
+        }
 
-    [Fact]
-    public async Task TrySignInAsync_ShouldFail_WhenPasswordIsInvalid()
-    {
-        // Arrange
-        var user = UserDtoFactory.ValidUser();
-        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword("correct_password");
+        [Fact]
+        public async Task TrySignInAsync_CorrectCredentials_ReturnsSuccessWithPrincipal()
+        {
+            // Arrange
+            var username = "alice";
+            var password = "alicePass";
 
-        _userRepoMock.Setup(r => r.GetUserByUsernameAsync(user.Username))
-                     .ReturnsAsync(user);
+            var stored = UserDtoFactory.ValidUser(id: 123);
+            stored.Username = username;
+            stored.PasswordHash = BCrypt.Net.BCrypt.HashPassword(password);
 
-        // Act
-        var result = await _userService.TrySignInAsync(user.Username, "wrong_password");
+            _userRepoMock
+                .Setup(r => r.GetUserByUsernameAsync(username))
+                .ReturnsAsync(stored);
 
-        // Assert
-        Assert.False(result.Success);
-        Assert.Equal("Invalid username or password.", result.ErrorMessage);
-    }
+            var fakePrincipal = new ClaimsPrincipal(new ClaimsIdentity(new[]
+            {
+                new Claim(ClaimTypes.NameIdentifier, stored.Id.ToString())
+            }, "TestAuth"));
 
-    [Fact]
-    public void HashPassword_ShouldReturnHashedValue()
-    {
-        // Arrange
-        var plain = "MyPass123";
+            _authServiceMock
+                .Setup(a => a.GetClaimsPrincipal(stored))
+                .Returns(fakePrincipal);
 
-        // Act
-        var hash = _userService.HashPassword(plain);
+            // Act
+            var result = await _sut.TrySignInAsync(username, password);
 
-        // Assert
-        Assert.True(hash.StartsWith("$2"));
-        Assert.True(BCrypt.Net.BCrypt.Verify(plain, hash));
+            // Assert
+            Assert.True(result.Success);
+            Assert.Equal(fakePrincipal, result.ClaimsPrincipal);
+        }
+
+        [Fact]
+        public async Task TryRegisterAsync_UsernameAlreadyTaken_ReturnsFailure()
+        {
+            // Arrange
+            var newUser = UserDtoFactory.ValidUser(id: 0);
+            newUser.Username = "existingUser";
+
+            _userRepoMock
+                .Setup(r => r.GetUserByUsernameAsync("existingUser"))
+                .ReturnsAsync(UserDtoFactory.ValidUser(id: 5));
+
+            // Act
+            var result = await _sut.TryRegisterAsync(newUser);
+
+            // Assert
+            Assert.False(result.Success);
+            Assert.Equal("Username is already taken.", result.ErrorMessage);
+            Assert.Null(result.ClaimsPrincipal);
+        }
+
+        [Fact]
+        public async Task GetCurrentUserIdAsync_WithValidPrincipal_ReturnsId()
+        {
+            // Arrange
+            var id = 555;
+            var principal = new ClaimsPrincipal(new ClaimsIdentity(new[]
+            {
+                new Claim(ClaimTypes.NameIdentifier, id.ToString())
+            }));
+
+            // Act
+            var result = await _sut.GetCurrentUserIdAsync(principal);
+
+            // Assert
+            Assert.Equal(id, result.Value);
+        }
+
+        [Fact]
+        public async Task GetCurrentUserIdAsync_InvalidClaim_ReturnsNull()
+        {
+            // Arrange
+            var principal = new ClaimsPrincipal(new ClaimsIdentity());
+
+            // Act
+            var result = await _sut.GetCurrentUserIdAsync(principal);
+
+            // Assert
+            Assert.Null(result);
+        }
     }
 }

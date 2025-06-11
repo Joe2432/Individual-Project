@@ -7,66 +7,95 @@
 
 <div class="container mt-4">
 
-    <div class="row mb-3">
-        <div class="col-6">
+    <!-- Header Section -->
+    <div class="row mb-3 align-items-center">
+        <div class="col-12 col-md-6 mb-2 mb-md-0">
             <h5>Hello, @User.Identity.Name!</h5>
         </div>
-        <div class="col-6 text-end">
+        <div class="col-12 col-md-6 text-md-end">
             <h5>Opponent: @Model.ViewModel.PlayerAName</h5>
         </div>
     </div>
 
     <hr />
 
-    <div>
-        <h3>Match Date: @Model.ViewModel.MatchDate?.ToString("dd MMM yyyy")</h3>
-        <p><strong>Score:</strong></p>
-        <ul class="list-group mb-4">
+    <!-- Match Info -->
+    <div class="mb-4">
+        <h4>Match Date: @Model.ViewModel.MatchDate?.ToString("dd MMM yyyy")</h4>
+        <p class="mb-1 fw-bold">Score:</p>
+        <ul class="list-group">
             @foreach (var score in Model.ViewModel.PlayerAGameByGame)
             {
                 <li class="list-group-item">@score</li>
             }
         </ul>
+    </div>
 
-        <div class="row">
-            <div class="col-md-6">
-                <p><strong>Aces:</strong> @Model.ViewModel.AcesPlayerA</p>
-                <p><strong>Double Faults:</strong> @Model.ViewModel.DoubleFaultsPlayerA</p>
-                <p><strong>1st Serve %:</strong> @Model.ViewModel.FirstServePctA %</p>
-                <p><strong>Win % on 1st Serve:</strong> @Model.ViewModel.WinPctOnFirstServeA %</p>
-                <p><strong>Win % on 2nd Serve:</strong> @Model.ViewModel.WinPctOnSecondServeA %</p>
-                <p><strong>Break Points:</strong> @Model.ViewModel.BreakPointsWonA/@Model.ViewModel.BreakPointsOpportunitiesA</p>
-                <p><strong>Tiebreaks Won:</strong> @Model.ViewModel.TiebreaksWonA</p>
-                <p><strong>Receiving Points Won:</strong> @Model.ViewModel.ReceivingPointsWonA</p>
-                <p><strong>Points Won:</strong> @Model.ViewModel.PointsWonA</p>
-                <p><strong>Games Won:</strong> @Model.ViewModel.GamesWonA</p>
-                <p><strong>Max Games in a Row:</strong> @Model.ViewModel.MaxGamesInARowA</p>
-                <p><strong>Max Points in a Row:</strong> @Model.ViewModel.MaxPointsInARowA</p>
-                <p><strong>Service Points Won:</strong> @Model.ViewModel.ServicePointsWonA</p>
-                <p><strong>Service Games Won:</strong> @Model.ViewModel.ServiceGamesWonA</p>
-                <p><strong>Total Shots:</strong> @Model.ViewModel.TotalShotsPlayerA</p>
-                <p><strong>Avg Shots/Point:</strong> @Model.ViewModel.AvgShotsPerPointA</p>
-                <p><strong>Max Shots in a Point:</strong> @Model.ViewModel.MaxShotsInPointA</p>
+    <!-- Player Statistics -->
+    <div class="row g-4">
+        <!-- Player A -->
+        <div class="col-12 col-lg-6">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    You
+                </div>
+                <div class="card-body">
+                    <p><strong>Aces:</strong> @Model.ViewModel.AcesPlayerA</p>
+                    <p><strong>Double Faults:</strong> @Model.ViewModel.DoubleFaultsPlayerA</p>
+                    <p><strong>1st Serve %:</strong> @Model.ViewModel.FirstServePctA %</p>
+                    <p><strong>Win % on 1st Serve:</strong> @Model.ViewModel.WinPctOnFirstServeA %</p>
+                    <p><strong>Win % on 2nd Serve:</strong> @Model.ViewModel.WinPctOnSecondServeA %</p>
+                    <p><strong>Break Points:</strong> @Model.ViewModel.BreakPointsWonA / @Model.ViewModel.BreakPointsOpportunitiesA</p>
+                    <p><strong>Tiebreaks Won:</strong> @Model.ViewModel.TiebreaksWonA</p>
+                    <p><strong>Receiving Points Won:</strong> @Model.ViewModel.ReceivingPointsWonA</p>
+                    <p><strong>Points Won:</strong> @Model.ViewModel.PointsWonA</p>
+                    <p><strong>Games Won:</strong> @Model.ViewModel.GamesWonA</p>
+                    <p><strong>Max Games in a Row:</strong> @Model.ViewModel.MaxGamesInARowA</p>
+                    <p><strong>Max Points in a Row:</strong> @Model.ViewModel.MaxPointsInARowA</p>
+                    <p><strong>Service Points Won:</strong> @Model.ViewModel.ServicePointsWonA</p>
+                    <p><strong>Service Games Won:</strong> @Model.ViewModel.ServiceGamesWonA</p>
+                </div>
             </div>
-            <div class="col-md-6 text-end">
-                <p><strong>Aces:</strong> @Model.ViewModel.AcesPlayerB</p>
-                <p><strong>Double Faults:</strong> @Model.ViewModel.DoubleFaultsPlayerB</p>
-                <p><strong>1st Serve %:</strong> @Model.ViewModel.FirstServePctB %</p>
-                <p><strong>Win % on 1st Serve:</strong> @Model.ViewModel.WinPctOnFirstServeB %</p>
-                <p><strong>Win % on 2nd Serve:</strong> @Model.ViewModel.WinPctOnSecondServeB %</p>
-                <p><strong>Break Points:</strong> @Model.ViewModel.BreakPointsWonB/@Model.ViewModel.BreakPointsOpportunitiesB</p>
-                <p><strong>Tiebreaks Won:</strong> @Model.ViewModel.TiebreaksWonB</p>
-                <p><strong>Receiving Points Won:</strong> @Model.ViewModel.ReceivingPointsWonB</p>
-                <p><strong>Points Won:</strong> @Model.ViewModel.PointsWonB</p>
-                <p><strong>Games Won:</strong> @Model.ViewModel.GamesWonB</p>
-                <p><strong>Max Games in a Row:</strong> @Model.ViewModel.MaxGamesInARowB</p>
-                <p><strong>Max Points in a Row:</strong> @Model.ViewModel.MaxPointsInARowB</p>
-                <p><strong>Service Points Won:</strong> @Model.ViewModel.ServicePointsWonB</p>
-                <p><strong>Service Games Won:</strong> @Model.ViewModel.ServiceGamesWonB</p>
-                <p><strong>Total Shots:</strong> @Model.ViewModel.TotalShotsPlayerB</p>
-                <p><strong>Avg Shots/Point:</strong> @Model.ViewModel.AvgShotsPerPointB</p>
-                <p><strong>Max Shots in a Point:</strong> @Model.ViewModel.MaxShotsInPointB</p>
+        </div>
+
+        <!-- Player B -->
+        <div class="col-12 col-lg-6">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header bg-danger text-white text-end">
+                    @Model.ViewModel.PlayerAName
+                </div>
+                <div class="card-body text-end">
+                    <p><strong>Aces:</strong> @Model.ViewModel.AcesPlayerB</p>
+                    <p><strong>Double Faults:</strong> @Model.ViewModel.DoubleFaultsPlayerB</p>
+                    <p><strong>1st Serve %:</strong> @Model.ViewModel.FirstServePctB %</p>
+                    <p><strong>Win % on 1st Serve:</strong> @Model.ViewModel.WinPctOnFirstServeB %</p>
+                    <p><strong>Win % on 2nd Serve:</strong> @Model.ViewModel.WinPctOnSecondServeB %</p>
+                    <p><strong>Break Points:</strong> @Model.ViewModel.BreakPointsWonB / @Model.ViewModel.BreakPointsOpportunitiesB</p>
+                    <p><strong>Tiebreaks Won:</strong> @Model.ViewModel.TiebreaksWonB</p>
+                    <p><strong>Receiving Points Won:</strong> @Model.ViewModel.ReceivingPointsWonB</p>
+                    <p><strong>Points Won:</strong> @Model.ViewModel.PointsWonB</p>
+                    <p><strong>Games Won:</strong> @Model.ViewModel.GamesWonB</p>
+                    <p><strong>Max Games in a Row:</strong> @Model.ViewModel.MaxGamesInARowB</p>
+                    <p><strong>Max Points in a Row:</strong> @Model.ViewModel.MaxPointsInARowB</p>
+                    <p><strong>Service Points Won:</strong> @Model.ViewModel.ServicePointsWonB</p>
+                    <p><strong>Service Games Won:</strong> @Model.ViewModel.ServiceGamesWonB</p>
+                </div>
             </div>
         </div>
     </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-secondary text-white">
+                    Match Stats Summary
+                </div>
+                <div class="card-body">
+                    <p><strong>Average Shots per Point:</strong> @Model.ViewModel.AvgShotsPerPoint</p>
+                    <p><strong>Max Shots in a Point:</strong> @Model.ViewModel.MaxShotsInPoint</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
