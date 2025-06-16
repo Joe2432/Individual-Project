@@ -128,24 +128,6 @@
         var avgShots = totalPoints > 0 ? Math.Round((double)totalShots / totalPoints, 1) : 0;
         var maxShots = pointDtos.Select(p => p.NumberOfShots).DefaultIfEmpty(0).Max();
 
-        var avgShotsA = pointsWonA > 0
-            ? Math.Round((double)totalShotsA / pointsWonA, 1)
-            : 0;
-        var avgShotsB = pointsWonB > 0
-            ? Math.Round((double)totalShotsB / pointsWonB, 1)
-            : 0;
-
-        var maxShotsA = pointDtos
-            .Where(p => p.IsUserWinner)
-            .Select(p => p.NumberOfShots)
-            .DefaultIfEmpty(0)
-            .Max();
-        var maxShotsB = pointDtos
-            .Where(p => !p.IsUserWinner)
-            .Select(p => p.NumberOfShots)
-            .DefaultIfEmpty(0)
-            .Max();
-
         var gamesListA = matchDto.SetScores.Select(s =>
             s.TiebreakScore.HasValue
                 ? $"{s.Player1Games}-{s.Player2Games}({s.TiebreakScore})"
@@ -204,8 +186,12 @@
             ServicePointsWonB = servicePointsWonB,
             ServiceGamesWonA = serviceGamesA,
             ServiceGamesWonB = serviceGamesB,
+
             AvgShotsPerPoint = avgShots,
-            MaxShotsInPoint = maxShots
+            MaxShotsInPoint = maxShots,
+
+            // NEW: include raw point data
+            Points = pointDtos
         };
     }
 }

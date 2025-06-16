@@ -46,4 +46,6 @@
     public int ServiceGamesWonB { get; set; }
     public double AvgShotsPerPoint { get; set; }
     public int MaxShotsInPoint { get; set; }
+    public List<PointViewModel> Points { get; set; } = new();
+
 }

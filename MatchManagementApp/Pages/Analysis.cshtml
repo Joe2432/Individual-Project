@@ -94,6 +94,50 @@
         </div>
     </div>
 
+    <!-- Per-Point Breakdown -->
+    <div class="mb-6">
+        <h2>Per-Point Breakdown</h2>
+        @{
+            int currentGame = 1;
+            int ptsInGame = 0;
+            var labels = new List<string>();
+        }
+        <ul class="list-unstyled">
+            @foreach (var p in vm.Points)
+            {
+                ptsInGame++;
+                var lbl = p.IsUserWinner
+                ? (ptsInGame == 1 ? "15–0" : ptsInGame == 2 ? "30–0" : ptsInGame == 3 ? "40–0" : "Game")
+                : (ptsInGame == 1 ? "0–15" : ptsInGame == 2 ? "0–30" : ptsInGame == 3 ? "0–40" : "Game");
+                labels.Add(lbl);
+
+                if (ptsInGame == 4 || lbl == "Game")
+                {
+                    <li class="media my-2">
+                        <div class="media-body">
+                            <strong>@currentGame.</strong> @string.Join(", ", labels)
+                            @if (!p.IsUserWinner && p.CurrentServer == "A")
+                            {
+                                <span class="badge bg-danger ms-2">SERVICE LOST</span>
+                            }
+                            @if (p.PointType.Contains("Break"))
+                            {
+                                <span class="badge bg-warning ms-1">BP</span>
+                            }
+                            @if (p.PointType == "Ace")
+                            {
+                                <span class="badge bg-success ms-1">SP</span>
+                            }
+                        </div>
+                    </li>
+                    currentGame++;
+                    ptsInGame = 0;
+                    labels.Clear();
+                }
+            }
+        </ul>
+    </div>
+
     <!-- Insights -->
     <div class="prose mb-6">
         <h2>Insights & Highlights</h2>
@@ -109,7 +153,7 @@
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        const vm = {
+        const vmData = {
             aces: [@vm.AcesPlayerA, @vm.AcesPlayerB],
             df: [@vm.DoubleFaultsPlayerA, @vm.DoubleFaultsPlayerB],
             first: [@vm.WinPctOnFirstServeA, @vm.WinPctOnFirstServeB],
@@ -121,9 +165,81 @@
             progressionB: @Html.Raw(JsonSerializer.Serialize(vm.PlayerBGameByGame))
         };
 
-        new Chart(document.getElementById('servePie'), { type: 'pie', data: { labels:['Aces (You)','Aces (Opp)','DF (You)','DF (Opp)'], datasets:[{ data: vm.aces.concat(vm.df) }] } });
-        new Chart(document.getElementById('serveWinPie'), { type: 'pie', data: { labels:['1st Win% (You)','1st Win% (Opp)'], datasets:[{ data:vm.first }] } });
-        new Chart(document.getElementById('statsComparison'), { type: 'bar', data:{ labels:vm.statsLabels, datasets:[{label:'You',data:vm.statsA},{label:'Opp',data:vm.statsB}] }, options:{ scales:{ y:{ beginAtZero:true } } } });
-        new Chart(document.getElementById('scoreFlow'), { type:'line', data:{ labels:vm.progressionA.map((_,i)=>`Set${i+1}`), datasets:[{label:'You',data:vm.progressionA.map(g=>g.split('-').map(n=>+n)[0]),tension:0.3},{label:'Opp',data:vm.progressionB.map(g=>g.split('-').map(n=>+n)[1]),tension:0.3}] }, options:{ scales:{ y:{ beginAtZero:true, stepSize:1 } } } });
+        // Pie charts
+        new Chart(document.getElementById('servePie'), {
+            type: 'pie',
+            data: {
+                labels: ['Aces (You)', 'Aces (Opp)', 'DF (You)', 'DF (Opp)'],
+                datasets:[{ data: vmData.aces.concat(vmData.df) }]
+            }
+        });
+        new Chart(document.getElementById('serveWinPie'), {
+            type: 'pie',
+            data: {
+                labels: ['1st Win% (You)', '1st Win% (Opp)'],
+                datasets:[{ data: vmData.first }]
+            }
+        });
+
+        // Bar chart
+        new Chart(document.getElementById('statsComparison'), {
+            type: 'bar',
+            data: {
+                labels: vmData.statsLabels,
+                datasets: [
+                    { label: 'You', data: vmData.statsA },
+                    { label: 'Opp', data: vmData.statsB }
+                ]
+            },
+            options: { scales: { y: { beginAtZero: true } } }
+        });
+
+        // Score Progression: separate line per set, angled through points
+        const youLines = vmData.progressionA.map((g, i) => {
+            const you = +g.split('-')[0];
+            const opp = +vmData.progressionB[i].split('-')[1];
+            const total = you + opp;
+            return {
+                label: i === 0 ? 'You' : '',
+                data: [ { x: 0, y: 0 }, { x: total, y: you } ],
+                showLine: true,
+                tension: 0
+            };
+        });
+        const oppLines = vmData.progressionB.map((g, i) => {
+            const opp = +g.split('-')[1];
+            const you = +vmData.progressionA[i].split('-')[0];
+            const total = you + opp;
+            return {
+                label: i === 0 ? 'Opp' : '',
+                data: [ { x: 0, y: 0 }, { x: total, y: opp } ],
+                showLine: true,
+                tension: 0
+            };
+        });
+
+        new Chart(document.getElementById('scoreFlow'), {
+            type: 'scatter',
+            data: { datasets: [ ...youLines, ...oppLines ] },
+            options: {
+                scales: {
+                    x: {
+                        title: { display: true, text: 'Total Games Played' },
+                        beginAtZero: true,
+                        ticks: { stepSize: 1 }
+                    },
+                    y: {
+                        title: { display: true, text: 'Games Won' },
+                        beginAtZero: true,
+                        ticks: { stepSize: 1 }
+                    }
+                },
+                plugins: {
+                    legend: { display: true }
+                }
+            }
+        });
     </script>
+}
+
 }
