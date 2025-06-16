@@ -121,5 +121,10 @@ namespace MatchManagementApp.UI.Pages
             }
             ViewData["ProfileImageBase64"] = "/images/default-user.png";
         }
+        public async Task<IActionResult> OnPostUndoAsync()
+        {
+            await _matchService.UndoLastPointAsync(Point.MatchId);
+            return RedirectToPage(new { id = Point.MatchId });
+        }
     }
 }

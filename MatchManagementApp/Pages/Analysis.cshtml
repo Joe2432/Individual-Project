@@ -1,8 +1,10 @@
 ﻿@page "{id:int}"
 @model MatchManagementApp.UI.Pages.AnalysisModel
 @using Microsoft.AspNetCore.Identity
+@using System.Text.Json
 @{
     ViewData["Title"] = "Match Analysis";
+    var vm = Model.ViewModel;
 }
 
 @section Styles {
@@ -12,18 +14,18 @@
 <div class="container mt-4">
     <!-- Match Info -->
     <div class="mb-4">
-        <h4>Match Date: @Model.ViewModel.MatchDate?.ToString("dd MMM yyyy")</h4>
-        <p class="mb-1 fw-bold">Score:</p>
-        <ul class="list-group">
-            @foreach (var score in Model.ViewModel.PlayerAGameByGame)
+        <h4>Match Date: @vm.MatchDate?.ToString("dd MMM yyyy")</h4>
+        <p class="mb-1 fw-bold">Score by Set:</p>
+        <ul class="list-group list-group-horizontal">
+            @foreach (var score in vm.PlayerAGameByGame)
             {
                 <li class="list-group-item">@score</li>
             }
         </ul>
     </div>
 
-    <!-- Player Statistics -->
-    <div class="row g-4">
+    <!-- Statistics Cards -->
+    <div class="row g-4 mb-6">
         <!-- Player A -->
         <div class="col-12 col-lg-6">
             <div class="card h-100 shadow-sm">
@@ -31,62 +33,97 @@
                     You
                 </div>
                 <div class="card-body">
-                    <p><strong>Aces:</strong> @Model.ViewModel.AcesPlayerA</p>
-                    <p><strong>Double Faults:</strong> @Model.ViewModel.DoubleFaultsPlayerA</p>
-                    <p><strong>1st Serve %:</strong> @Model.ViewModel.FirstServePctA %</p>
-                    <p><strong>Win % on 1st Serve:</strong> @Model.ViewModel.WinPctOnFirstServeA %</p>
-                    <p><strong>Win % on 2nd Serve:</strong> @Model.ViewModel.WinPctOnSecondServeA %</p>
-                    <p><strong>Break Points:</strong> @Model.ViewModel.BreakPointsWonA / @Model.ViewModel.BreakPointsOpportunitiesA</p>
-                    <p><strong>Tiebreaks Won:</strong> @Model.ViewModel.TiebreaksWonA</p>
-                    <p><strong>Receiving Points Won:</strong> @Model.ViewModel.ReceivingPointsWonA</p>
-                    <p><strong>Points Won:</strong> @Model.ViewModel.PointsWonA</p>
-                    <p><strong>Games Won:</strong> @Model.ViewModel.GamesWonA</p>
-                    <p><strong>Max Games in a Row:</strong> @Model.ViewModel.MaxGamesInARowA</p>
-                    <p><strong>Max Points in a Row:</strong> @Model.ViewModel.MaxPointsInARowA</p>
-                    <p><strong>Service Points Won:</strong> @Model.ViewModel.ServicePointsWonA</p>
-                    <p><strong>Service Games Won:</strong> @Model.ViewModel.ServiceGamesWonA</p>
+                    <p><strong>Aces:</strong> @vm.AcesPlayerA</p>
+                    <p><strong>Double Faults:</strong> @vm.DoubleFaultsPlayerA</p>
+                    <p><strong>1st Serve %:</strong> @vm.FirstServePctA %</p>
+                    <p><strong>Win % on 1st Serve:</strong> @vm.WinPctOnFirstServeA %</p>
+                    <p><strong>Win % on 2nd Serve:</strong> @vm.WinPctOnSecondServeA %</p>
+                    <p><strong>Break Points:</strong> @vm.BreakPointsWonA / @vm.BreakPointsOpportunitiesA</p>
+                    <p><strong>Tiebreaks Won:</strong> @vm.TiebreaksWonA</p>
+                    <p><strong>Receiving Points Won:</strong> @vm.ReceivingPointsWonA</p>
+                    <p><strong>Points Won:</strong> @vm.PointsWonA</p>
+                    <p><strong>Games Won:</strong> @vm.GamesWonA</p>
+                    <p><strong>Max Games Streak:</strong> @vm.MaxGamesInARowA</p>
+                    <p><strong>Max Points Streak:</strong> @vm.MaxPointsInARowA</p>
+                    <p><strong>Service Games Won:</strong> @vm.ServiceGamesWonA</p>
                 </div>
             </div>
         </div>
-
         <!-- Player B -->
         <div class="col-12 col-lg-6">
             <div class="card h-100 shadow-sm">
                 <div class="card-header bg-danger text-white text-end">
-                    @Model.ViewModel.PlayerAName
+                    @vm.PlayerBName
                 </div>
                 <div class="card-body text-end">
-                    <p><strong>Aces:</strong> @Model.ViewModel.AcesPlayerB</p>
-                    <p><strong>Double Faults:</strong> @Model.ViewModel.DoubleFaultsPlayerB</p>
-                    <p><strong>1st Serve %:</strong> @Model.ViewModel.FirstServePctB %</p>
-                    <p><strong>Win % on 1st Serve:</strong> @Model.ViewModel.WinPctOnFirstServeB %</p>
-                    <p><strong>Win % on 2nd Serve:</strong> @Model.ViewModel.WinPctOnSecondServeB %</p>
-                    <p><strong>Break Points:</strong> @Model.ViewModel.BreakPointsWonB / @Model.ViewModel.BreakPointsOpportunitiesB</p>
-                    <p><strong>Tiebreaks Won:</strong> @Model.ViewModel.TiebreaksWonB</p>
-                    <p><strong>Receiving Points Won:</strong> @Model.ViewModel.ReceivingPointsWonB</p>
-                    <p><strong>Points Won:</strong> @Model.ViewModel.PointsWonB</p>
-                    <p><strong>Games Won:</strong> @Model.ViewModel.GamesWonB</p>
-                    <p><strong>Max Games in a Row:</strong> @Model.ViewModel.MaxGamesInARowB</p>
-                    <p><strong>Max Points in a Row:</strong> @Model.ViewModel.MaxPointsInARowB</p>
-                    <p><strong>Service Points Won:</strong> @Model.ViewModel.ServicePointsWonB</p>
-                    <p><strong>Service Games Won:</strong> @Model.ViewModel.ServiceGamesWonB</p>
+                    <p><strong>Aces:</strong> @vm.AcesPlayerB</p>
+                    <p><strong>Double Faults:</strong> @vm.DoubleFaultsPlayerB</p>
+                    <p><strong>1st Serve %:</strong> @vm.FirstServePctB %</p>
+                    <p><strong>Win % on 1st Serve:</strong> @vm.WinPctOnFirstServeB %</p>
+                    <p><strong>Win % on 2nd Serve:</strong> @vm.WinPctOnSecondServeB %</p>
+                    <p><strong>Break Points:</strong> @vm.BreakPointsWonB / @vm.BreakPointsOpportunitiesB</p>
+                    <p><strong>Tiebreaks Won:</strong> @vm.TiebreaksWonB</p>
+                    <p><strong>Receiving Points Won:</strong> @vm.ReceivingPointsWonB</p>
+                    <p><strong>Points Won:</strong> @vm.PointsWonB</p>
+                    <p><strong>Games Won:</strong> @vm.GamesWonB</p>
+                    <p><strong>Max Games Streak:</strong> @vm.MaxGamesInARowB</p>
+                    <p><strong>Max Points Streak:</strong> @vm.MaxPointsInARowB</p>
+                    <p><strong>Service Games Won:</strong> @vm.ServiceGamesWonB</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="row mt-4">
-        <div class="col-12">
-            <div class="card shadow-sm">
-                <div class="card-header bg-secondary text-white">
-                    Match Stats Summary
-                </div>
-                <div class="card-body">
-                    <p><strong>Average Shots per Point:</strong> @Model.ViewModel.AvgShotsPerPoint</p>
-                    <p><strong>Max Shots in a Point:</strong> @Model.ViewModel.MaxShotsInPoint</p>
-                </div>
-            </div>
+    <!-- Chart Grid -->
+    <div class="grid grid-cols-2 gap-6 mb-6">
+        <div class="card p-4 shadow rounded-2xl">
+            <h2 class="text-xl font-semibold mb-2">Serve Outcomes</h2>
+            <canvas id="servePie"></canvas>
+        </div>
+        <div class="card p-4 shadow rounded-2xl">
+            <h2 class="text-xl font-semibold mb-2">Serve Win %</h2>
+            <canvas id="serveWinPie"></canvas>
+        </div>
+        <div class="card p-4 shadow rounded-2xl col-span-2">
+            <h2 class="text-xl font-semibold mb-2">Stats Comparison (You vs Opponent)</h2>
+            <canvas id="statsComparison"></canvas>
+        </div>
+        <div class="card p-4 shadow rounded-2xl col-span-2">
+            <h2 class="text-xl font-semibold mb-2">Score Progression</h2>
+            <canvas id="scoreFlow"></canvas>
         </div>
     </div>
 
+    <!-- Insights -->
+    <div class="prose mb-6">
+        <h2>Insights & Highlights</h2>
+        <ul>
+            <li><strong>Total Points:</strong> You @vm.PointsWonA vs Opponent @vm.PointsWonB.</li>
+            <li><strong>Longest Point Streak:</strong> You @vm.MaxPointsInARowA, Opponent @vm.MaxPointsInARowB.</li>
+            <li><strong>Break Conversion:</strong> You @vm.BreakPointsWonA/@vm.BreakPointsOpportunitiesA, Opponent @vm.BreakPointsWonB/@vm.BreakPointsOpportunitiesB.</li>
+            <li><strong>Average Rally:</strong> @vm.AvgShotsPerPoint shots per point.</li>
+        </ul>
+    </div>
 </div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const vm = {
+            aces: [@vm.AcesPlayerA, @vm.AcesPlayerB],
+            df: [@vm.DoubleFaultsPlayerA, @vm.DoubleFaultsPlayerB],
+            first: [@vm.WinPctOnFirstServeA, @vm.WinPctOnFirstServeB],
+            second: [@vm.WinPctOnSecondServeA, @vm.WinPctOnSecondServeB],
+            statsLabels: ['Points Won','Games Won','Breaks Won','Tiebreaks','Max Games Streak','Max Points Streak'],
+            statsA: [@vm.PointsWonA,@vm.GamesWonA,@vm.BreakPointsWonA,@vm.TiebreaksWonA,@vm.MaxGamesInARowA,@vm.MaxPointsInARowA],
+            statsB: [@vm.PointsWonB,@vm.GamesWonB,@vm.BreakPointsWonB,@vm.TiebreaksWonB,@vm.MaxGamesInARowB,@vm.MaxPointsInARowB],
+            progressionA: @Html.Raw(JsonSerializer.Serialize(vm.PlayerAGameByGame)),
+            progressionB: @Html.Raw(JsonSerializer.Serialize(vm.PlayerBGameByGame))
+        };
+
+        new Chart(document.getElementById('servePie'), { type: 'pie', data: { labels:['Aces (You)','Aces (Opp)','DF (You)','DF (Opp)'], datasets:[{ data: vm.aces.concat(vm.df) }] } });
+        new Chart(document.getElementById('serveWinPie'), { type: 'pie', data: { labels:['1st Win% (You)','1st Win% (Opp)'], datasets:[{ data:vm.first }] } });
+        new Chart(document.getElementById('statsComparison'), { type: 'bar', data:{ labels:vm.statsLabels, datasets:[{label:'You',data:vm.statsA},{label:'Opp',data:vm.statsB}] }, options:{ scales:{ y:{ beginAtZero:true } } } });
+        new Chart(document.getElementById('scoreFlow'), { type:'line', data:{ labels:vm.progressionA.map((_,i)=>`Set${i+1}`), datasets:[{label:'You',data:vm.progressionA.map(g=>g.split('-').map(n=>+n)[0]),tension:0.3},{label:'Opp',data:vm.progressionB.map(g=>g.split('-').map(n=>+n)[1]),tension:0.3}] }, options:{ scales:{ y:{ beginAtZero:true, stepSize:1 } } } });
+    </script>
+}

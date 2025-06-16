@@ -80,8 +80,7 @@ else if (Model.MatchViewModel != null)
         </span>
     </div>
 
-    <!-- Single centered Shot button -->
-    <div class="text-center mb-4">
+    <div class="d-flex justify-content-center gap-2 mb-4">
         <form method="post" class="d-inline-block">
             <input type="hidden" asp-for="Point.MatchId" />
             <input type="hidden" name="Point.IsUserWinner" value="@(Model.MatchViewModel.CurrentServer == "User" ? "true" : "false")" />
@@ -89,6 +88,13 @@ else if (Model.MatchViewModel != null)
             <input type="hidden" asp-for="Point.NumberOfShots" />
             <button type="submit" name="IncrementShot" class="btn btn-secondary btn-lg px-4">
                 Shot (@Model.Point.NumberOfShots)
+            </button>
+        </form>
+
+        <form method="post" asp-page-handler="Undo" class="d-inline-block">
+            <input type="hidden" asp-for="Point.MatchId" />
+            <button type="submit" class="btn btn-outline-secondary btn-lg">
+                Undo Last Point
             </button>
         </form>
     </div>
@@ -101,8 +107,6 @@ else if (Model.MatchViewModel != null)
                 <input type="hidden" name="Point.IsUserWinner" value="true" />
                 <input type="hidden" name="Point.IsFirstServe" value="@Model.Point.IsFirstServe.ToString().ToLower()" />
                 <input type="hidden" asp-for="Point.NumberOfShots" />
-
-                @* Removed Shot button from here *@
 
                 @if (Model.MatchViewModel.CurrentServer == "User")
                 {
@@ -134,8 +138,6 @@ else if (Model.MatchViewModel != null)
                 <input type="hidden" name="Point.IsUserWinner" value="false" />
                 <input type="hidden" name="Point.IsFirstServe" value="@Model.Point.IsFirstServe.ToString().ToLower()" />
                 <input type="hidden" asp-for="Point.NumberOfShots" />
-
-                @* Removed Shot button from here *@
 
                 @if (Model.MatchViewModel.CurrentServer == "Opponent")
                 {

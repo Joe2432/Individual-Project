@@ -1,64 +1,92 @@
-﻿.container {
-    max-width: 900px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: #222;
+﻿.stats-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 1rem;
 }
 
-h4, h5 {
-    font-weight: 600;
-    color: #111;
+/* Each card row */
+.stat-card {
+    display: grid;
+    grid-template-areas:
+        "left middle right"
+        "label label label";
+    grid-template-columns: 3rem 1fr 3rem;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
 }
 
-hr {
+/* Left & right values */
+.stat-left,
+.stat-right {
+    padding: 0.5rem;
+    font-weight: bold;
+    text-align: center;
+    background: #f9f9f9;
+    z-index: 1;
+}
+
+.stat-left {
+    grid-area: left;
+}
+
+.stat-right {
+    grid-area: right;
+}
+
+/* Middle bar container */
+.stat-middle {
+    position: relative;
+    grid-area: middle;
+    display: flex;
+    height: 1.5rem;
+    margin: 0.5rem 0;
+    background: #eee;
+    border-radius: 0.75rem;
+    overflow: hidden;
+}
+
+    .stat-middle .bar {
+        height: 100%;
+        transition: width 0.3s ease;
+        position: absolute;
+        top: 0;
+    }
+
+    .stat-middle .you {
+        left: 0;
+        background: #2196f3;
+    }
+
+    .stat-middle .opp {
+        right: 0;
+        background: #e91e63;
+    }
+
+/* Stat label under the bars */
+.stat-label {
+    grid-area: label;
+    padding: 0.5rem;
+    text-align: center;
+    font-size: 0.875rem;
+    color: #555;
     border-top: 1px solid #ddd;
 }
 
-.card {
-    border-radius: 10px;
-    transition: box-shadow 0.3s ease, transform 0.3s ease;
-}
-
-    .card:hover {
-        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
-        transform: translateY(-4px);
+/* === Desktop tweak: label floats next to value === */
+@media (min-width: 768px) {
+    .stat-card {
+        grid-template-areas: "left middle right label";
+        grid-template-columns: 3rem 1fr 3rem auto;
+        align-items: center;
     }
 
-.card-header {
-    font-weight: 700;
-    font-size: 1.15rem;
-    border-radius: 10px 10px 0 0;
-}
-
-.card-body p {
-    font-size: 1rem;
-    margin: 0.3rem 0;
-    color: #444;
-}
-
-@media (max-width: 768px) {
-    .card-body p {
-        font-size: 0.9rem;
-    }
-
-    .card-header {
-        font-size: 1rem;
-    }
-
-    h4 {
-        font-size: 1.3rem;
-    }
-}
-
-@media (max-width: 576px) {
-    .container {
-        padding: 0 15px;
-    }
-
-    .card-body p {
-        font-size: 0.85rem;
-    }
-
-    h4, h5 {
-        font-size: 1.1rem;
+    .stat-label {
+        border-top: none;
+        padding: 0 1rem;
+        font-weight: 600;
     }
 }
