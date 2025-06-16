@@ -1,6 +1,5 @@
 ﻿@page "{id:int}"
 @model MatchManagementApp.UI.Pages.AnalysisModel
-@using Microsoft.AspNetCore.Identity
 @using System.Text.Json
 @{
     ViewData["Title"] = "Match Analysis";
@@ -9,6 +8,12 @@
 
 @section Styles {
     <link rel="stylesheet" href="~/css/analysis-page.css" />
+    <style>
+        .card canvas {
+            width: 100% !important;
+            height: 300px !important;
+        }
+    </style>
 }
 
 <div class="container mt-4">
@@ -29,18 +34,16 @@
         <!-- Player A -->
         <div class="col-12 col-lg-6">
             <div class="card h-100 shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    You
-                </div>
+                <div class="card-header bg-primary text-white">You</div>
                 <div class="card-body">
                     <p><strong>Aces:</strong> @vm.AcesPlayerA</p>
                     <p><strong>Double Faults:</strong> @vm.DoubleFaultsPlayerA</p>
                     <p><strong>1st Serve %:</strong> @vm.FirstServePctA %</p>
-                    <p><strong>Win % on 1st Serve:</strong> @vm.WinPctOnFirstServeA %</p>
-                    <p><strong>Win % on 2nd Serve:</strong> @vm.WinPctOnSecondServeA %</p>
-                    <p><strong>Break Points:</strong> @vm.BreakPointsWonA / @vm.BreakPointsOpportunitiesA</p>
+                    <p><strong>Win % 1st Serve:</strong> @vm.WinPctOnFirstServeA %</p>
+                    <p><strong>Win % 2nd Serve:</strong> @vm.WinPctOnSecondServeA %</p>
+                    <p><strong>Breaks:</strong> @vm.BreakPointsWonA/@vm.BreakPointsOpportunitiesA</p>
                     <p><strong>Tiebreaks Won:</strong> @vm.TiebreaksWonA</p>
-                    <p><strong>Receiving Points Won:</strong> @vm.ReceivingPointsWonA</p>
+                    <p><strong>Rec. Points Won:</strong> @vm.ReceivingPointsWonA</p>
                     <p><strong>Points Won:</strong> @vm.PointsWonA</p>
                     <p><strong>Games Won:</strong> @vm.GamesWonA</p>
                     <p><strong>Max Games Streak:</strong> @vm.MaxGamesInARowA</p>
@@ -52,18 +55,16 @@
         <!-- Player B -->
         <div class="col-12 col-lg-6">
             <div class="card h-100 shadow-sm">
-                <div class="card-header bg-danger text-white text-end">
-                    @vm.PlayerBName
-                </div>
+                <div class="card-header bg-danger text-white text-end">@vm.PlayerBName</div>
                 <div class="card-body text-end">
                     <p><strong>Aces:</strong> @vm.AcesPlayerB</p>
                     <p><strong>Double Faults:</strong> @vm.DoubleFaultsPlayerB</p>
                     <p><strong>1st Serve %:</strong> @vm.FirstServePctB %</p>
-                    <p><strong>Win % on 1st Serve:</strong> @vm.WinPctOnFirstServeB %</p>
-                    <p><strong>Win % on 2nd Serve:</strong> @vm.WinPctOnSecondServeB %</p>
-                    <p><strong>Break Points:</strong> @vm.BreakPointsWonB / @vm.BreakPointsOpportunitiesB</p>
+                    <p><strong>Win % 1st Serve:</strong> @vm.WinPctOnFirstServeB %</p>
+                    <p><strong>Win % 2nd Serve:</strong> @vm.WinPctOnSecondServeB %</p>
+                    <p><strong>Breaks:</strong> @vm.BreakPointsWonB/@vm.BreakPointsOpportunitiesB</p>
                     <p><strong>Tiebreaks Won:</strong> @vm.TiebreaksWonB</p>
-                    <p><strong>Receiving Points Won:</strong> @vm.ReceivingPointsWonB</p>
+                    <p><strong>Rec. Points Won:</strong> @vm.ReceivingPointsWonB</p>
                     <p><strong>Points Won:</strong> @vm.PointsWonB</p>
                     <p><strong>Games Won:</strong> @vm.GamesWonB</p>
                     <p><strong>Max Games Streak:</strong> @vm.MaxGamesInARowB</p>
@@ -80,166 +81,140 @@
             <h2 class="text-xl font-semibold mb-2">Serve Outcomes</h2>
             <canvas id="servePie"></canvas>
         </div>
+
         <div class="card p-4 shadow rounded-2xl">
             <h2 class="text-xl font-semibold mb-2">Serve Win %</h2>
             <canvas id="serveWinPie"></canvas>
         </div>
+
         <div class="card p-4 shadow rounded-2xl col-span-2">
             <h2 class="text-xl font-semibold mb-2">Stats Comparison (You vs Opponent)</h2>
             <canvas id="statsComparison"></canvas>
         </div>
-        <div class="card p-4 shadow rounded-2xl col-span-2">
-            <h2 class="text-xl font-semibold mb-2">Score Progression</h2>
-            <canvas id="scoreFlow"></canvas>
-        </div>
-    </div>
 
-    <!-- Per-Point Breakdown -->
-    <div class="mb-6">
-        <h2>Per-Point Breakdown</h2>
-        @{
-            int currentGame = 1;
-            int ptsInGame = 0;
-            var labels = new List<string>();
+        @for (int i = 0; i < vm.PlayerAGameProgressions.Count; i++)
+        {
+            <div class="card p-4 shadow rounded-2xl col-span-2">
+                <h2 class="text-xl font-semibold mb-2">Score Progression — Set @(i + 1)</h2>
+                <canvas id="scoreFlow@(i)"></canvas>
+            </div>
         }
-        <ul class="list-unstyled">
-            @foreach (var p in vm.Points)
-            {
-                ptsInGame++;
-                var lbl = p.IsUserWinner
-                ? (ptsInGame == 1 ? "15–0" : ptsInGame == 2 ? "30–0" : ptsInGame == 3 ? "40–0" : "Game")
-                : (ptsInGame == 1 ? "0–15" : ptsInGame == 2 ? "0–30" : ptsInGame == 3 ? "0–40" : "Game");
-                labels.Add(lbl);
-
-                if (ptsInGame == 4 || lbl == "Game")
-                {
-                    <li class="media my-2">
-                        <div class="media-body">
-                            <strong>@currentGame.</strong> @string.Join(", ", labels)
-                            @if (!p.IsUserWinner && p.CurrentServer == "A")
-                            {
-                                <span class="badge bg-danger ms-2">SERVICE LOST</span>
-                            }
-                            @if (p.PointType.Contains("Break"))
-                            {
-                                <span class="badge bg-warning ms-1">BP</span>
-                            }
-                            @if (p.PointType == "Ace")
-                            {
-                                <span class="badge bg-success ms-1">SP</span>
-                            }
-                        </div>
-                    </li>
-                    currentGame++;
-                    ptsInGame = 0;
-                    labels.Clear();
-                }
-            }
-        </ul>
-    </div>
-
-    <!-- Insights -->
-    <div class="prose mb-6">
-        <h2>Insights & Highlights</h2>
-        <ul>
-            <li><strong>Total Points:</strong> You @vm.PointsWonA vs Opponent @vm.PointsWonB.</li>
-            <li><strong>Longest Point Streak:</strong> You @vm.MaxPointsInARowA, Opponent @vm.MaxPointsInARowB.</li>
-            <li><strong>Break Conversion:</strong> You @vm.BreakPointsWonA/@vm.BreakPointsOpportunitiesA, Opponent @vm.BreakPointsWonB/@vm.BreakPointsOpportunitiesB.</li>
-            <li><strong>Average Rally:</strong> @vm.AvgShotsPerPoint shots per point.</li>
-        </ul>
     </div>
 </div>
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        const vmData = {
-            aces: [@vm.AcesPlayerA, @vm.AcesPlayerB],
-            df: [@vm.DoubleFaultsPlayerA, @vm.DoubleFaultsPlayerB],
-            first: [@vm.WinPctOnFirstServeA, @vm.WinPctOnFirstServeB],
-            second: [@vm.WinPctOnSecondServeA, @vm.WinPctOnSecondServeB],
-            statsLabels: ['Points Won','Games Won','Breaks Won','Tiebreaks','Max Games Streak','Max Points Streak'],
-            statsA: [@vm.PointsWonA,@vm.GamesWonA,@vm.BreakPointsWonA,@vm.TiebreaksWonA,@vm.MaxGamesInARowA,@vm.MaxPointsInARowA],
-            statsB: [@vm.PointsWonB,@vm.GamesWonB,@vm.BreakPointsWonB,@vm.TiebreaksWonB,@vm.MaxGamesInARowB,@vm.MaxPointsInARowB],
-            progressionA: @Html.Raw(JsonSerializer.Serialize(vm.PlayerAGameByGame)),
-            progressionB: @Html.Raw(JsonSerializer.Serialize(vm.PlayerBGameByGame))
-        };
-
-        // Pie charts
-        new Chart(document.getElementById('servePie'), {
-            type: 'pie',
-            data: {
-                labels: ['Aces (You)', 'Aces (Opp)', 'DF (You)', 'DF (Opp)'],
-                datasets:[{ data: vmData.aces.concat(vmData.df) }]
-            }
-        });
-        new Chart(document.getElementById('serveWinPie'), {
-            type: 'pie',
-            data: {
-                labels: ['1st Win% (You)', '1st Win% (Opp)'],
-                datasets:[{ data: vmData.first }]
-            }
-        });
-
-        // Bar chart
-        new Chart(document.getElementById('statsComparison'), {
-            type: 'bar',
-            data: {
-                labels: vmData.statsLabels,
-                datasets: [
-                    { label: 'You', data: vmData.statsA },
-                    { label: 'Opp', data: vmData.statsB }
-                ]
-            },
-            options: { scales: { y: { beginAtZero: true } } }
-        });
-
-        // Score Progression: separate line per set, angled through points
-        const youLines = vmData.progressionA.map((g, i) => {
-            const you = +g.split('-')[0];
-            const opp = +vmData.progressionB[i].split('-')[1];
-            const total = you + opp;
-            return {
-                label: i === 0 ? 'You' : '',
-                data: [ { x: 0, y: 0 }, { x: total, y: you } ],
-                showLine: true,
-                tension: 0
-            };
-        });
-        const oppLines = vmData.progressionB.map((g, i) => {
-            const opp = +g.split('-')[1];
-            const you = +vmData.progressionA[i].split('-')[0];
-            const total = you + opp;
-            return {
-                label: i === 0 ? 'Opp' : '',
-                data: [ { x: 0, y: 0 }, { x: total, y: opp } ],
-                showLine: true,
-                tension: 0
-            };
-        });
-
-        new Chart(document.getElementById('scoreFlow'), {
-            type: 'scatter',
-            data: { datasets: [ ...youLines, ...oppLines ] },
-            options: {
-                scales: {
-                    x: {
-                        title: { display: true, text: 'Total Games Played' },
-                        beginAtZero: true,
-                        ticks: { stepSize: 1 }
-                    },
-                    y: {
-                        title: { display: true, text: 'Games Won' },
-                        beginAtZero: true,
-                        ticks: { stepSize: 1 }
-                    }
-                },
-                plugins: {
-                    legend: { display: true }
+        document.addEventListener('DOMContentLoaded', () => {
+            // helper to instantiate a chart
+            function createChart(id, config) {
+                const canvas = document.getElementById(id);
+                if (!canvas) {
+                    console.warn(`canvas #${id} not found`);
+                    return;
                 }
+                const ctx = canvas.getContext('2d');
+                new Chart(ctx, config);
             }
+
+            // Pie: Serve Outcomes
+            createChart('servePie', {
+                type: 'pie',
+                data: {
+                    labels: ['Aces (You)', 'Aces (Opp)', 'DF (You)', 'DF (Opp)'],
+                    datasets: [{
+                        data: [@vm.AcesPlayerA, @vm.AcesPlayerB, @vm.DoubleFaultsPlayerA, @vm.DoubleFaultsPlayerB]
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            // Pie: Serve Win %
+            createChart('serveWinPie', {
+                type: 'pie',
+                data: {
+                    labels: ['1st Win% (You)', '1st Win% (Opp)'],
+                    datasets: [{
+                        data: [@vm.WinPctOnFirstServeA, @vm.WinPctOnFirstServeB]
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            // Bar: Stats Comparison
+            createChart('statsComparison', {
+                type: 'bar',
+                data: {
+                    labels: ['Points Won','Games Won','Breaks Won','Tiebreaks','Max Games Streak','Max Points Streak'],
+                    datasets: [
+                        {
+                            label: 'You',
+                            data: [@vm.PointsWonA, @vm.GamesWonA, @vm.BreakPointsWonA, @vm.TiebreaksWonA, @vm.MaxGamesInARowA, @vm.MaxPointsInARowA]
+                        },
+                        {
+                            label: 'Opp',
+                            data: [@vm.PointsWonB, @vm.GamesWonB, @vm.BreakPointsWonB, @vm.TiebreaksWonB, @vm.MaxGamesInARowB, @vm.MaxPointsInARowB]
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+
+            // Deserialize per-set progressions
+            const progA = @Html.Raw(JsonSerializer.Serialize(vm.PlayerAGameProgressions));
+            const progB = @Html.Raw(JsonSerializer.Serialize(vm.PlayerBGameProgressions));
+
+            // Line: cumulative games won per set
+            progA.forEach((setA, idx) => {
+                const canvas = document.getElementById(`scoreFlow${idx}`);
+                if (!canvas) return console.warn(`canvas #scoreFlow${idx} not found`);
+                const ctx = canvas.getContext('2d');
+
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        datasets: [
+                            {
+                                label: `You – Set ${idx + 1}`,
+                                data: setA.map((wins, g) => ({ x: g + 1, y: wins })),
+                                borderColor: '#3b82f6',
+                                borderWidth: 2,
+                                fill: false,
+                                tension: 0
+                            },
+                            {
+                                label: `Opp – Set ${idx + 1}`,
+                                data: (progB[idx] || []).map((wins, g) => ({ x: g + 1, y: wins })),
+                                borderColor: '#ef4444',
+                                borderWidth: 2,
+                                fill: false,
+                                tension: 0
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                title: { display: true, text: 'Game Number' },
+                                beginAtZero: true,
+                                ticks: { stepSize: 1 }
+                            },
+                            y: {
+                                title: { display: true, text: 'Cumulative Games Won' },
+                                beginAtZero: true,
+                                ticks: { stepSize: 1 }
+                            }
+                        },
+                        plugins: { legend: { position: 'top' } }
+                    }
+                });
+            });
         });
     </script>
-}
-
 }

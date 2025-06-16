@@ -47,5 +47,6 @@
     public double AvgShotsPerPoint { get; set; }
     public int MaxShotsInPoint { get; set; }
     public List<PointViewModel> Points { get; set; } = new();
-
+    public List<List<int>> PlayerAGameProgressions { get; set; } = new();
+    public List<List<int>> PlayerBGameProgressions { get; set; } = new();
 }

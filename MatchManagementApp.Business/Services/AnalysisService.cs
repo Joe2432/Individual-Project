@@ -189,8 +189,6 @@
 
             AvgShotsPerPoint = avgShots,
             MaxShotsInPoint = maxShots,
-
-            // NEW: include raw point data
             Points = pointDtos
         };
     }

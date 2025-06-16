@@ -38,7 +38,6 @@ public class MatchHistoryModel : PageModel
         if (userId == null)
             return;
 
-        // Set profile image base64 for layout navbar
         var user = await _userService.GetUserByIdAsync(userId.Value);
         if (user?.ImageBytes != null && user.ImageBytes.Length > 0)
         {
