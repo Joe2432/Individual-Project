@@ -36,8 +36,9 @@ public class MatchHistoryModel : PageModel
     {
         var userId = await _userService.GetCurrentUserIdAsync(User);
         if (userId == null)
+        {
             return;
-
+        }
         var user = await _userService.GetUserByIdAsync(userId.Value);
         if (user?.ImageBytes != null && user.ImageBytes.Length > 0)
         {

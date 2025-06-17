@@ -30,11 +30,15 @@ namespace MatchManagementApp.UI.Pages.Account
 
             var userId = await _userService.GetCurrentUserIdAsync(User);
             if (userId == null)
+            {
                 return RedirectToPage("/Account/Login");
 
+            }
             var userDto = await _userService.GetUserByIdAsync(userId.Value);
             if (userDto == null)
+            {
                 return RedirectToPage("/Account/Login");
+            }
 
             Profile = UserMapper.ToUserViewModel(userDto);
 
@@ -78,8 +82,9 @@ namespace MatchManagementApp.UI.Pages.Account
 
             var userId = await _userService.GetCurrentUserIdAsync(User);
             if (userId == null)
+            {
                 return RedirectToPage("/Account/Login");
-
+            }
             await _userService.UpdateUserImageAsync(userId.Value, imageData);
 
             return RedirectToPage();
@@ -92,7 +97,10 @@ namespace MatchManagementApp.UI.Pages.Account
             {
                 var userDto = await _userService.GetUserByIdAsync(userId.Value);
                 if (userDto != null)
+
+                {
                     Profile = UserMapper.ToUserViewModel(userDto);
+                }
             }
         }
 

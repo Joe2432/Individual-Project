@@ -41,12 +41,27 @@
 
             if (inMaxiTiebreak)
             {
-                if (winner == 1) p1Tiebreak++; else p2Tiebreak++;
+                if (winner == 1)
+                {
+                    p1Tiebreak++;
+                }
+                else
+                {
+                    p2Tiebreak++;
+                }
 
                 if ((p1Tiebreak >= SUPER_TIEBREAK_POINTS || p2Tiebreak >= SUPER_TIEBREAK_POINTS)
                     && Math.Abs(p1Tiebreak - p2Tiebreak) >= 2)
                 {
-                    if (p1Tiebreak > p2Tiebreak) p1Sets++; else p2Sets++;
+                    if (p1Tiebreak > p2Tiebreak)
+                    {
+                        p1Sets++;
+                    }
+                    else
+                    {
+                        p2Sets++;
+                    }
+
                     sets[setIndex].Player1Games = p1Tiebreak;
                     sets[setIndex].Player2Games = p2Tiebreak;
                     sets[setIndex].TiebreakScore = null;
@@ -56,35 +71,69 @@
             }
             else if (inTiebreak)
             {
-                if (winner == 1) p1Tiebreak++; else p2Tiebreak++;
-
+                if (winner == 1)
+                {
+                    p1Tiebreak++;
+                }
+                else
+                {
+                    p2Tiebreak++;
+                }
                 if ((p1Tiebreak >= TIEBREAK_POINTS || p2Tiebreak >= TIEBREAK_POINTS)
                     && Math.Abs(p1Tiebreak - p2Tiebreak) >= 2)
                 {
-                    if (p1Tiebreak > p2Tiebreak) p1Games++; else p2Games++;
+                    if (p1Tiebreak > p2Tiebreak)
+                    {
+                        p1Games++;
+                    }
+                    else
+                    {
+                        p2Games++;
+                    }
                     sets[setIndex].Player1Games = p1Games;
                     sets[setIndex].Player2Games = p2Games;
                     sets[setIndex].TiebreakScore = Math.Min(p1Tiebreak, p2Tiebreak);
 
-                    if (p1Games > p2Games) p1Sets++; else p2Sets++;
-
+                    if (p1Games > p2Games)
+                    {
+                        p1Sets++;
+                    }
+                    else
+                    {
+                        p2Sets++;
+                    }
                     p1Games = p2Games = p1Tiebreak = p2Tiebreak = 0;
                     setIndex++;
                     if (p1Sets < setsToWin && p2Sets < setsToWin && (p1Sets + p2Sets) < maxSets)
+                    {
                         sets.Add(new SetScoreDto());
-
+                    }
                     inTiebreak = false;
                 }
             }
             else
             {
-                if (winner == 1) p1Points++; else p2Points++;
-
+                if (winner == 1)
+                {
+                    p1Points++;
+                }
+                else
+                {
+                    p2Points++;
+                }
                 if (noAd || decisivePoint)
                 {
                     if ((p1Points >= 4 || p2Points >= 4))
                     {
-                        if (p1Points > p2Points) p1Games++; else p2Games++;
+                        if (p1Points > p2Points)
+                        {
+                            p1Games++;
+                        }
+                        else
+                        {
+                            p2Games++;
+                        }
+
                         p1Points = p2Points = 0;
                     }
                 }
@@ -92,7 +141,15 @@
                 {
                     if ((p1Points >= 4 || p2Points >= 4) && Math.Abs(p1Points - p2Points) >= 2)
                     {
-                        if (p1Points > p2Points) p1Games++; else p2Games++;
+                        if (p1Points > p2Points)
+                        {
+                            p1Games++;
+                        }
+                        else
+                        {
+                            p2Games++;
+                        }
+
                         p1Points = p2Points = 0;
                     }
                 }
@@ -100,13 +157,23 @@
                 if ((p1Games >= GAMES_TO_WIN_SET || p2Games >= GAMES_TO_WIN_SET)
                     && Math.Abs(p1Games - p2Games) >= 2)
                 {
-                    if (p1Games > p2Games) p1Sets++; else p2Sets++;
+                    if (p1Games > p2Games)
+                    {
+                        p1Sets++;
+                    }
+                    else
+                    {
+                        p2Sets++;
+                    }
+
                     sets[setIndex].Player1Games = p1Games;
                     sets[setIndex].Player2Games = p2Games;
                     p1Games = p2Games = 0;
                     setIndex++;
                     if (p1Sets < setsToWin && p2Sets < setsToWin && (p1Sets + p2Sets) < maxSets)
+                    {
                         sets.Add(new SetScoreDto());
+                    }
                 }
             }
 
@@ -142,16 +209,22 @@
         foreach (var set in sets)
         {
             if (set.Player1Games == 0 && set.Player2Games == 0)
+            {
                 continue;
+            }
 
             string setScore;
             if (set.TiebreakScore.HasValue)
             {
                 bool p1WonSet = set.Player1Games > set.Player2Games;
                 if (p1WonSet)
+                {
                     setScore = $"{set.Player1Games}-{set.Player2Games}({set.TiebreakScore})";
+                }
                 else
+                {
                     setScore = $"{set.Player1Games}({set.TiebreakScore})-{set.Player2Games}";
+                }
             }
             else
             {
@@ -166,13 +239,25 @@
 
     private string FormatGameScore(int p1, int p2, bool tiebreak, bool suddenDeath)
     {
-        if (tiebreak) return $"{p1} - {p2}";
+        if (tiebreak)
+        {
+            return $"{p1} - {p2}";
+        }
+
         string[] scores = { "0", "15", "30", "40", "Ad" };
 
         if (p1 >= 3 && p2 >= 3)
         {
-            if (p1 == p2) return suddenDeath ? "40-40" : "Deuce";
-            if (p1 > p2) return "Ad - 40";
+            if (p1 == p2)
+            {
+                return suddenDeath ? "40-40" : "Deuce";
+            }
+
+            if (p1 > p2)
+            {
+                return "Ad - 40";
+            }
+
             return "40 - Ad";
         }
 

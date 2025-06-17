@@ -25,13 +25,15 @@ namespace MatchManagementApp.UI.Pages
 
             var userId = await _userService.GetCurrentUserIdAsync(User);
             if (userId == null)
+            {
                 return RedirectToPage("/Account/Login");
-
+            }
             var dto = await _analysisService.GetAnalysisAsync(id, userId.Value);
             ViewModel = AnalysisMapper.ToViewModel(dto);
             if (ViewModel == null)
+            {
                 return NotFound();
-
+            }
             return Page();
         }
 

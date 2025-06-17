@@ -36,8 +36,9 @@ public class LoginModel : PageModel
     public async Task<IActionResult> OnPostAsync()
     {
         if (!ModelState.IsValid)
+        {
             return Page();
-
+        }
         var signInResult = await _userService.TrySignInAsync(Input.Username, Input.Password);
 
         if (!signInResult.Success)

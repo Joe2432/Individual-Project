@@ -109,7 +109,8 @@
             // helper to instantiate a chart
             function createChart(id, config) {
                 const canvas = document.getElementById(id);
-                if (!canvas) {
+                if (!canvas) 
+                {
                     console.warn(`canvas #${id} not found`);
                     return;
                 }
@@ -171,7 +172,10 @@
             // Line: cumulative games won per set
             progA.forEach((setA, idx) => {
                 const canvas = document.getElementById(`scoreFlow${idx}`);
-                if (!canvas) return console.warn(`canvas #scoreFlow${idx} not found`);
+                if (!canvas)
+                {
+                    return console.warn(`canvas #scoreFlow${idx} not found`);
+                }
                 const ctx = canvas.getContext('2d');
 
                 new Chart(ctx, {

@@ -64,8 +64,9 @@
     {
         var match = await _matchRepository.GetMatchByIdAsync(matchId);
         if (match == null)
+        {
             return "Match not found";
-
+        }
         var points = await _pointRepository.GetPointsByMatchIdAsync(matchId);
         var scored = _scorekeepingService.CalculateScore(match, points);
 
@@ -76,7 +77,9 @@
     {
         var match = await _matchRepository.GetMatchByIdAsync(matchId);
         if (match == null)
+        {
             return;
+        }
 
         var point = new PointDto
         {
@@ -98,7 +101,9 @@
     {
         var match = await _matchRepository.GetMatchByIdAsync(matchId);
         if (match == null)
+        {
             return null;
+        }
 
         var points = await _pointRepository.GetPointsByMatchIdAsync(matchId);
         var updated = _scorekeepingService.CalculateScore(match, points);
@@ -142,20 +147,25 @@
         }
 
         if (!string.IsNullOrWhiteSpace(type))
+        {
             matches = matches.Where(m => m.MatchType.Equals(type, StringComparison.OrdinalIgnoreCase)).ToList();
-
+        }
         if (!string.IsNullOrWhiteSpace(surface))
+        {
             matches = matches.Where(m => m.Surface.Equals(surface, StringComparison.OrdinalIgnoreCase)).ToList();
-
+        }
         if (date.HasValue)
+        {
             matches = matches.Where(m => m.MatchDate?.Date == date.Value.Date).ToList();
-
+        }
         if (dateFrom.HasValue)
+        {
             matches = matches.Where(m => m.MatchDate >= dateFrom.Value).ToList();
-
+        }
         if (dateTo.HasValue)
+        {
             matches = matches.Where(m => m.MatchDate <= dateTo.Value).ToList();
-
+        }
         foreach (var match in matches)
         {
             var points = await _pointRepository.GetPointsByMatchIdAsync(match.Id);

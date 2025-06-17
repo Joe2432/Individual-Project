@@ -24,8 +24,9 @@ namespace MatchManagementApp.UI.Pages.Account
         public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)
+            {
                 return Page();
-
+            }
             var userDto = UserMapper.ToCreateDto(UserRegistration);
 
             var registerResult = await _userService.TryRegisterAsync(userDto);

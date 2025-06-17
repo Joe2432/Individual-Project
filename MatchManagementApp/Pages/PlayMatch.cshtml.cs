@@ -36,11 +36,15 @@ namespace MatchManagementApp.UI.Pages
             await SetProfileImageAsync();
 
             var userId = await _userService.GetCurrentUserIdAsync(User);
-            if (userId == null) return RedirectToPage("/Account/Login");
-
+            if (userId == null)
+            {
+                return RedirectToPage("/Account/Login");
+            }
             var match = await _matchService.GetMatchForPlayingAsync(id, userId.Value);
-            if (match == null) return NotFound();
-
+            if (match == null)
+            {
+                return NotFound();
+            }
             var points = await _pointService.GetPointsForMatchAsync(id, User);
             var serveState = _serveStateService.GetServeState(match, points);
 
@@ -59,11 +63,15 @@ namespace MatchManagementApp.UI.Pages
             await SetProfileImageAsync();
 
             var userId = await _userService.GetCurrentUserIdAsync(User);
-            if (userId == null) return RedirectToPage("/Account/Login");
-
+            if (userId == null)
+            {
+                return RedirectToPage("/Account/Login");
+            }
             var match = await _matchService.GetMatchForPlayingAsync(Point.MatchId, userId.Value);
-            if (match == null) return NotFound();
-
+            if (match == null)
+            {
+                return NotFound();
+            }
             var points = await _pointService.GetPointsForMatchAsync(Point.MatchId, User);
             var serveState = _serveStateService.GetServeState(match, points);
 

@@ -50,7 +50,9 @@ public class UserRepository : IUserRepository
     {
         var user = await _context.Users.FindAsync(userId);
         if (user == null)
+        {
             throw new Exception($"User with ID {userId} not found.");
+        }
 
         user.UpdateImage(imageData);
 

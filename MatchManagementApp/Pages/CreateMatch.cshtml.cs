@@ -32,12 +32,14 @@ namespace MatchManagementApp.UI.Pages
             await SetProfileImageAsync();
 
             if (!ModelState.IsValid)
+            {
                 return Page();
-
+            }
             var userId = await _userService.GetCurrentUserIdAsync(User);
             if (userId == null)
+            {
                 return RedirectToPage("/Account/Login");
-
+            }
             var dto = MatchMapper.ToCreateDto(Match, userId.Value);
             TempData["PendingMatch"] = JsonSerializer.Serialize(dto);
 
